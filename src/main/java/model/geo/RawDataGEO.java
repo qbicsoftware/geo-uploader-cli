@@ -63,7 +63,7 @@ public class RawDataGEO {
 
     public String[] getRawFilesRow() {
         String line = fileName + "\t" + fileType + "\t" + fileChecksum + "\t" + instrumentModel + "\t" + readLength + "\t" + singleOrPairedEnd;
-        line = line.replace("null", "").replace(" ", "");
+        line = line.replace("null", "");
         return line.split("\t");
     }
 }
