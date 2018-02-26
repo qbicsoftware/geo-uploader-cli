@@ -27,13 +27,14 @@ public class GEOExcelCreater {
         HSSFSheet sheet = (HSSFSheet) wb.getSheetAt(0);
 
         addRawFilesRows(sheet, raws);
-        //adaptSampleHeader(sheet, samples);
-        //addSampleRows(sheet, samples);
+        adaptSampleHeader(sheet, samples);
+        addSampleRows(sheet, samples);
 
         try {
             FileOutputStream out = new FileOutputStream(new File(OUT_PATH), false);
             wb.write(out);
             out.close();
+            System.out.println("");
             System.out.println("Excel written successfully..");
 
         } catch (IOException e) {
@@ -82,15 +83,15 @@ public class GEOExcelCreater {
     }
 
     private void addRawFilesRows(Sheet sheet, List<RawDataGEO> raw) {
-        sheet.shiftRows(65, sheet.getLastRowNum(), raw.size() - 2);
-//        for (int i = 0; i < raw.size(); i++){
-//            sheet.createRow(i+65);
-//            for (int j=0; j<sheet.getRow(64).getLastCellNum();j++) {
-//                sheet.getRow(i+65).createCell(j);
-//                sheet.getRow(i+65).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
-//            }
-//
-//        }
+        sheet.shiftRows(53, sheet.getLastRowNum(), raw.size() - 2);
+        for (int i = 0; i < raw.size(); i++){
+            sheet.createRow(i+53);
+            for (int j=0; j<sheet.getRow(52).getLastCellNum()-1;j++) {
+                sheet.getRow(i+53).createCell(j);
+                sheet.getRow(i+53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
+            }
+
+        }
     }
 
 }
