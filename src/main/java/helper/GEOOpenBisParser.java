@@ -120,7 +120,8 @@ public class GEOOpenBisParser {
             for (DataSetFile file : files.getObjects()) {
                 if (file.getPermId().toString().contains(".fastq")) {
                     String[] path = file.getPermId().toString().split("/");
-                    computeMd5(file, rawGeo);
+                    //TODO wrong md5 checksum
+                    //computeMd5(file, rawGeo);
                     geo.setRawFile(path[path.length - 1]);
                     rawGeo.setFileName(geo.getRawFile());
                     //TODO hard coded
@@ -225,6 +226,7 @@ public class GEOOpenBisParser {
         return complete.digest();
     }
 
+    //TODO wrong MD5 checksum
     public void computeMd5(DataSetFile file, RawDataGEO rawGeo) {
         IDataSetFileId fileId = new DataSetFilePermId(new DataSetPermId(file.getDataSetPermId().toString()));
         InputStream stream = dss.downloadFiles(sessionToken, Arrays.asList(fileId) , new DataSetFileDownloadOptions());
