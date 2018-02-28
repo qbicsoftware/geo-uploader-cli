@@ -35,12 +35,13 @@ import java.util.*;
 public class GEOOpenBisParser {
 
     public static Logger log = LogManager.getLogger(GEOOpenBisParser.class);
-    public String spaceName, sessionToken;
+    public String spaceName, sessionToken, username;
     public IApplicationServerApi app;
     public IDataStoreServerApi dss;
 
-    public GEOOpenBisParser(String spaceName, String sessionToken, IApplicationServerApi app, IDataStoreServerApi dss) {
+    public GEOOpenBisParser(String spaceName, String username, String sessionToken, IApplicationServerApi app, IDataStoreServerApi dss) {
         this.spaceName = spaceName;
+        this.username = username;
         this.sessionToken = sessionToken;
         this.app = app;
         this.dss = dss;
@@ -61,13 +62,11 @@ public class GEOOpenBisParser {
         }
 
         if (space == null) {
-            log.error("Space " + spaceName + " does not exist for user " + Main.ch.getUserID());
-            System.out.println("Space " + spaceName + " does not exist for user " + Main.ch.getUserID());
+            log.error("Space " + spaceName + " does not exist for user " + username);
             app.logout(sessionToken);
             System.exit(0);
         } else {
-            log.info("Found space " + spaceName + " for user " + Main.ch.getUserID());
-            System.out.println("Found space " + spaceName + " for user " + Main.ch.getUserID());
+            System.out.println("Found space " + spaceName + " for user " + username);
         }
     }
 
@@ -183,6 +182,8 @@ public class GEOOpenBisParser {
         HashMap<String, List> parsed = new HashMap<>();
         parsed.put("sample", sampleGEOList);
         parsed.put("raw", rawDataGEOList);
+
+        System.out.println("Finished parsing succesfully ...");
 
         return parsed;
     }
