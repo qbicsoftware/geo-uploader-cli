@@ -34,8 +34,7 @@ public class GEOExcelCreater {
             FileOutputStream out = new FileOutputStream(new File(OUT_PATH), false);
             wb.write(out);
             out.close();
-            System.out.println("");
-            System.out.println("Excel written successfully..");
+            System.out.println("Excel written successfully! Good bye :-)");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -84,11 +83,11 @@ public class GEOExcelCreater {
 
     private void addRawFilesRows(Sheet sheet, List<RawDataGEO> raw) {
         sheet.shiftRows(53, sheet.getLastRowNum(), raw.size() - 2);
-        for (int i = 0; i < raw.size(); i++){
-            sheet.createRow(i+53);
-            for (int j=0; j<sheet.getRow(52).getLastCellNum()-1;j++) {
-                sheet.getRow(i+53).createCell(j);
-                sheet.getRow(i+53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
+        for (int i = 0; i < raw.size(); i++) {
+            sheet.createRow(i + 53);
+            for (int j = 0; j < sheet.getRow(52).getLastCellNum() - 1; j++) {
+                sheet.getRow(i + 53).createCell(j);
+                sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
             }
 
         }

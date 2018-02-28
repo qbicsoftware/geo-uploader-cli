@@ -32,7 +32,7 @@ public class OutputWriter {
             }
             row.trim();
             System.out.println(i + " " + row);
-            i = i+1;
+            i = i + 1;
         }
     }
 
@@ -48,7 +48,7 @@ public class OutputWriter {
             }
             row.trim();
             System.out.println(i + " " + row);
-            i = i+1;
+            i = i + 1;
         }
     }
 
