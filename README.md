@@ -2,7 +2,5 @@
 Extracts data from openBIS and produces GEO's upload excel spreadsheet
 
 ```bash
-~$ java -jar geo-uploader.jar                  
+~$ java -jar geo.jar --user $username$ --project $projectCode$ --out /path/to/output   
 ```
-
-After executing the jar you are asked for your openBIS username, password and the space which contains the data you want to upload.
