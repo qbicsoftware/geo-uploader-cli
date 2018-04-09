@@ -3,55 +3,63 @@ package main;
 import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.systemsx.cisd.common.spring.HttpInvokerUtils;
-import com.sun.xml.internal.bind.v2.TODO;
-import connection.CredentialHandler;
+import commandline.CommandLineParameters;
 import helper.GEOExcelCreater;
 import helper.GEOOpenBisParser;
-import io.OutputWriter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import picocli.CommandLine;
 
 public class Main {
 
-    public static Logger log = LogManager.getLogger(Main.class);
+  public static void main(String[] args) throws IOException {
+    CommandLineParameters params = new CommandLineParameters();
+    new CommandLine(params).parse(args);
 
-    // Enter space name to parse
-    public static String spaceName = "MFT_SYNERGY_GLIOBLASTOMA_TREATMENT";
-
-    // Enter path to credentials file: datasource.url, datasource.user, datasource.password
-    //TODO Argument parser or portlet
-    public static CredentialHandler ch = new CredentialHandler("/Users/spaethju/liferay/qbic-ext.properties");
-
-    public static void main(String[] args) throws IOException {
-        // Reference the DSS
-        IDataStoreServerApi dss =
-                HttpInvokerUtils.createStreamSupportingServiceStub(IDataStoreServerApi.class,
-                        "https://qbis.qbic.uni-tuebingen.de:444/datastore_server" + IDataStoreServerApi.SERVICE_URL, 10000);
-
-        // get a reference to AS API
-        IApplicationServerApi app = HttpInvokerUtils.createServiceStub(IApplicationServerApi.class, "https://qbis.qbic.uni-tuebingen.de/openbis/openbis" + IApplicationServerApi.SERVICE_URL, 10000);
-
-        // login to obtain a session token
-        String sessionToken = app.login(ch.getUserID(), ch.getPw());
-
-        // Parse space
-        GEOOpenBisParser geoParser = new GEOOpenBisParser(spaceName, sessionToken, app, dss);
-        HashMap<String, List> geo = geoParser.parseSingle();
-
-        // logout to release the resources related with the session
-        app.logout(sessionToken);
-
-        // write output to console
-        OutputWriter.writeNumberOfSamples(geo.get("sample"));
-        OutputWriter.writeSamplesToConsole(geo.get("sample"));
-        OutputWriter.writeRawDataToConsole(geo.get("raw"));
-
-        // Create excel from template
-        GEOExcelCreater xls = new GEOExcelCreater(geo.get("sample"), geo.get("raw"));
-
+    java.io.Console console = System.console();
+    String password = new String(console.readPassword("Password: "));
+    if (password.isEmpty()) {
+      System.out.println("You need to provide a password.");
+      System.exit(1);
     }
+
+    // Reference the DSS
+    IDataStoreServerApi dss =
+        HttpInvokerUtils.createStreamSupportingServiceStub(IDataStoreServerApi.class,
+            "https://qbis.qbic.uni-tuebingen.de:444/datastore_server"
+                + IDataStoreServerApi.SERVICE_URL, 10000);
+
+    // get a reference to AS API
+    IApplicationServerApi app = HttpInvokerUtils.createServiceStub(IApplicationServerApi.class,
+        "https://qbis.qbic.uni-tuebingen.de/openbis/openbis" + IApplicationServerApi.SERVICE_URL,
+        10000);
+
+    // login to obtain a session token
+    String sessionToken = app.login(params.userName, password);
+
+    System.out.println("Connection to openbis established succesfully.");
+
+    System.out.format("Provide project identifier:  ");
+
+    if (params.project.isEmpty() || params.project == null) {
+      System.out.println("You need to provide a project.");
+      System.exit(1);
+    }
+    String[] split = params.project.split("/");
+    params.project = split[split.length - 1];
+    System.out.println(params.project);
+    // Parse space
+    GEOOpenBisParser geoParser = new GEOOpenBisParser(params.project, params.userName, sessionToken,
+        app, dss);
+    HashMap<String, List> geo = geoParser.parseSingle();
+
+    // logout to release the resources related with the session
+    app.logout(sessionToken);
+
+    // Create excel from template
+    GEOExcelCreater xls = new GEOExcelCreater(geo.get("sample"), geo.get("raw"), params.output,
+        params.project);
+
+  }
 }
