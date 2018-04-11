@@ -4,8 +4,8 @@ import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.systemsx.cisd.common.spring.HttpInvokerUtils;
 import commandline.CommandLineParameters;
-import helper.GEOExcelCreater;
-import helper.GEOOpenBisParser;
+import module.geo.GEOExcelCreater;
+import module.geo.GEOOpenBisParser;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +52,7 @@ public class Main {
     // Parse space
     GEOOpenBisParser geoParser = new GEOOpenBisParser(params.project, params.userName, sessionToken,
         app, dss);
-    HashMap<String, List> geo = geoParser.parseSingle();
+    HashMap<String, List> geo = geoParser.parse();
 
     // logout to release the resources related with the session
     app.logout(sessionToken);

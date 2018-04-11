@@ -1,9 +1,8 @@
-package helper;
+package module.geo;
 
 import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.common.search.SearchResult;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.dataset.fetchoptions.DataSetFetchOptions;
-import ch.ethz.sis.openbis.generic.asapi.v3.dto.dataset.id.DataSetPermId;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.project.Project;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.project.fetchoptions.ProjectFetchOptions;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.project.search.ProjectSearchCriteria;
@@ -15,32 +14,22 @@ import ch.ethz.sis.openbis.generic.asapi.v3.dto.vocabulary.fetchoptions.Vocabula
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.vocabulary.search.VocabularyTermSearchCriteria;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.DataSetFile;
-import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.download.DataSetFileDownloadOptions;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.fetchoptions.DataSetFileFetchOptions;
-import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.id.DataSetFilePermId;
-import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.id.IDataSetFileId;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.search.DataSetFileSearchCriteria;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.DatatypeConverter;
-import model.geo.RawDataGEO;
-import model.geo.SampleGEO;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import module.geo.model.RawDataGEO;
+import module.geo.model.SampleGEO;
 
 public class GEOOpenBisParser {
 
-  public String spaceCode, projectCode, sessionToken, username;
-  public IApplicationServerApi app;
-  public IDataStoreServerApi dss;
-  public Project project = null;
+  private String spaceCode, projectCode, sessionToken, username;
+  private IApplicationServerApi app;
+  private IDataStoreServerApi dss;
+  private Project project = null;
 
   public GEOOpenBisParser(String projectCode, String username, String sessionToken,
       IApplicationServerApi app, IDataStoreServerApi dss) {
@@ -53,7 +42,7 @@ public class GEOOpenBisParser {
     checkSpaceAvailability();
   }
 
-  public static Map<String, String> parseProperty(String xml, String property) {
+  private static Map<String, String> parseProperty(String xml, String property) {
     HashMap<String, String> properties = new HashMap<>();
     ArrayList<String> lines = new ArrayList<>(Arrays.asList(xml.split("\n")));
     for (String line : lines) {
@@ -69,32 +58,8 @@ public class GEOOpenBisParser {
     return properties;
   }
 
-  public static byte[] getBytesOfMd5(InputStream is) throws IOException {
-    byte[] buffer = new byte[1024];
-    MessageDigest complete = null;
-    try {
-      complete = MessageDigest.getInstance("MD5");
-    } catch (NoSuchAlgorithmException e) {
-      return null;
-    }
 
-    int numRead;
-    do {
-      numRead = is.read(buffer);
-      if (numRead > 0) {
-        complete.update(buffer, 0, numRead);
-      }
-    } while (numRead != -1);
-
-    is.close();
-    return complete.digest();
-  }
-
-  //public HashMap<String, List> parsePaired() {
-  //
-  //}
-
-  public void checkSpaceAvailability() {
+  private void checkSpaceAvailability() {
     // invoke other API methods using the session token, for instance search for spaces
     ProjectSearchCriteria projectSearchCriteria = new ProjectSearchCriteria();
     projectSearchCriteria.withCode().thatEquals(projectCode);
@@ -116,7 +81,7 @@ public class GEOOpenBisParser {
     }
   }
 
-  public HashMap<String, List> parseSingle() {
+  public HashMap<String, List> parse() {
     // Set up fetch options
     SampleFetchOptions fetchOptions = new SampleFetchOptions();
     fetchOptions.withType();
@@ -177,8 +142,6 @@ public class GEOOpenBisParser {
       for (DataSetFile file : files.getObjects()) {
         if (file.getPermId().toString().contains(".fastq")) {
           String[] path = file.getPermId().toString().split("/");
-          //TODO wrong md5 checksum
-          //computeMd5(file, rawGeo);
           geo.setRawFile(path[path.length - 1]);
           rawGeo.setFileName(geo.getRawFile());
           //TODO hard coded

@@ -1,4 +1,4 @@
-package model.geo;
+package module.geo.model;
 
 import java.util.Map;
 
