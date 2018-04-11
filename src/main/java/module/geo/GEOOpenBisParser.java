@@ -65,7 +65,8 @@ public class GEOOpenBisParser {
     projectSearchCriteria.withCode().thatEquals(projectCode);
     ProjectFetchOptions projectFetchOptions = new ProjectFetchOptions();
     projectFetchOptions.withSpace();
-    SearchResult<Project> projects = app.searchProjects(sessionToken, projectSearchCriteria, projectFetchOptions);
+    SearchResult<Project> projects = app
+        .searchProjects(sessionToken, projectSearchCriteria, projectFetchOptions);
 
     // Check if space if space is available for user
 
@@ -159,13 +160,13 @@ public class GEOOpenBisParser {
             .getProperty("Q_SAMPLE_TYPE").equals("RNA")) {
           geo.setTitle(measuredSample.getProperty("Q_SECONDARY_NAME"));
           geo.setMolecule(measuredSample.getProperty("Q_SAMPLE_TYPE"));
-         if (measuredSample.getProperties().containsKey("Q_PROPERTIES")) {
-           geo.setCharacteristics(
-               parseProperty(measuredSample.getProperty("Q_PROPERTIES"), "qcategorical"));
-           while (geo.getCharacteristics().keySet().size() < 3) {
-             geo.getCharacteristics().put("", "");
-           }
-         }
+          if (measuredSample.getProperties().containsKey("Q_PROPERTIES")) {
+            geo.setCharacteristics(
+                parseProperty(measuredSample.getProperty("Q_PROPERTIES"), "qcategorical"));
+            while (geo.getCharacteristics().keySet().size() < 3) {
+              geo.getCharacteristics().put("", "");
+            }
+          }
         }
       }
     }

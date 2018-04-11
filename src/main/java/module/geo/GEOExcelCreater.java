@@ -52,7 +52,8 @@ public class GEOExcelCreater {
 
   }
 
-  private void adaptSampleHeader(Sheet sheet, List<SampleGEO> samples) throws IndexOutOfBoundsException{
+  private void adaptSampleHeader(Sheet sheet, List<SampleGEO> samples)
+      throws IndexOutOfBoundsException {
     Row sampleHeader = sheet.getRow(19);
 
     //For each row, iterate through each columns

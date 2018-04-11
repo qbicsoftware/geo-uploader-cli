@@ -4,11 +4,11 @@ import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.systemsx.cisd.common.spring.HttpInvokerUtils;
 import commandline.CommandLineParameters;
-import module.geo.GEOExcelCreater;
-import module.geo.GEOOpenBisParser;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import module.geo.GEOExcelCreater;
+import module.geo.GEOOpenBisParser;
 import picocli.CommandLine;
 
 public class Main {
