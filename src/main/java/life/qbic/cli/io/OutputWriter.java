@@ -1,4 +1,4 @@
-package io;
+package life.qbic.cli.io;
 
 import java.util.List;
 import model.geo.RawDataGEO;
