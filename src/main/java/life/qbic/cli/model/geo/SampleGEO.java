@@ -1,4 +1,4 @@
-package model.geo;
+package life.qbic.cli.model.geo;
 
 import java.util.Map;
 

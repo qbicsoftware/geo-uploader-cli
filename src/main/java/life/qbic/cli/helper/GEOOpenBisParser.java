@@ -1,9 +1,8 @@
-package helper;
+package life.qbic.cli.helper;
 
 import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.common.search.SearchResult;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.dataset.fetchoptions.DataSetFetchOptions;
-import ch.ethz.sis.openbis.generic.asapi.v3.dto.dataset.id.DataSetPermId;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.project.Project;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.project.fetchoptions.ProjectFetchOptions;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.project.search.ProjectSearchCriteria;
@@ -15,10 +14,7 @@ import ch.ethz.sis.openbis.generic.asapi.v3.dto.vocabulary.fetchoptions.Vocabula
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.vocabulary.search.VocabularyTermSearchCriteria;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.DataSetFile;
-import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.download.DataSetFileDownloadOptions;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.fetchoptions.DataSetFileFetchOptions;
-import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.id.DataSetFilePermId;
-import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.id.IDataSetFileId;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.search.DataSetFileSearchCriteria;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,11 +25,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.DatatypeConverter;
-import model.geo.RawDataGEO;
-import model.geo.SampleGEO;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import life.qbic.cli.model.geo.RawDataGEO;
+import life.qbic.cli.model.geo.SampleGEO;
 
 public class GEOOpenBisParser {
 
@@ -100,7 +93,8 @@ public class GEOOpenBisParser {
     projectSearchCriteria.withCode().thatEquals(projectCode);
     ProjectFetchOptions projectFetchOptions = new ProjectFetchOptions();
     projectFetchOptions.withSpace();
-    SearchResult<Project> projects = app.searchProjects(sessionToken, projectSearchCriteria, projectFetchOptions);
+    SearchResult<Project> projects = app
+        .searchProjects(sessionToken, projectSearchCriteria, projectFetchOptions);
 
     // Check if space if space is available for user
 
@@ -196,13 +190,13 @@ public class GEOOpenBisParser {
             .getProperty("Q_SAMPLE_TYPE").equals("RNA")) {
           geo.setTitle(measuredSample.getProperty("Q_SECONDARY_NAME"));
           geo.setMolecule(measuredSample.getProperty("Q_SAMPLE_TYPE"));
-         if (measuredSample.getProperties().containsKey("Q_PROPERTIES")) {
-           geo.setCharacteristics(
-               parseProperty(measuredSample.getProperty("Q_PROPERTIES"), "qcategorical"));
-           while (geo.getCharacteristics().keySet().size() < 3) {
-             geo.getCharacteristics().put("", "");
-           }
-         }
+          if (measuredSample.getProperties().containsKey("Q_PROPERTIES")) {
+            geo.setCharacteristics(
+                parseProperty(measuredSample.getProperty("Q_PROPERTIES"), "qcategorical"));
+            while (geo.getCharacteristics().keySet().size() < 3) {
+              geo.getCharacteristics().put("", "");
+            }
+          }
         }
       }
     }

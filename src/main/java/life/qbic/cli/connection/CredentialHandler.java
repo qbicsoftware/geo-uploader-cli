@@ -1,4 +1,4 @@
-package connection;
+package life.qbic.cli.connection;
 
 import java.io.FileInputStream;
 import java.io.IOException;
