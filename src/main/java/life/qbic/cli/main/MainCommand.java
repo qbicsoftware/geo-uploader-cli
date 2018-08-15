@@ -31,6 +31,4 @@ public class MainCommand extends AbstractCommand {
   public String project;
   @Option(names = {"-o", "--out"}, required = true, description = "The output directory.")
   public String output;
-  @Option(names = {"-h", "--help"}, usageHelp = true, description = "display a help message")
-  private boolean helpRequested = false;
 }

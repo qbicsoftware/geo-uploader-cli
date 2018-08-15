@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class CredentialHandler {
 
-  private String url, pw, userID;
+  private static String url, pw, userID;
 
   public CredentialHandler(String pathToCredentialProperties) {
     Properties prop = new Properties();
