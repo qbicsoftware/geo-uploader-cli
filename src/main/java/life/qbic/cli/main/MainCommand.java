@@ -9,7 +9,7 @@ import picocli.CommandLine.Option;
  * time.
  */
 @Command(
-   name = "GEO-Uploader",
+    name = "GEO-Uploader",
     header = "%n@|green Uploads RAW Data to GEO directly from openBis|@")
 public class MainCommand extends AbstractCommand {
   // TODO: add your command-line options as members of this class using picocli's annotations, for instance:
