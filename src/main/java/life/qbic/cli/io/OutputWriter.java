@@ -1,8 +1,8 @@
 package life.qbic.cli.io;
 
 import java.util.List;
-import model.geo.RawDataGEO;
-import model.geo.SampleGEO;
+import life.qbic.cli.model.geo.RawDataGEO;
+import life.qbic.cli.model.geo.SampleGEO;
 
 public class OutputWriter {
 
