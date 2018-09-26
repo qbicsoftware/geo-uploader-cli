@@ -1,10 +1,11 @@
 package life.qbic.cli.helper;
 
 import life.qbic.cli.model.geo.RawDataGEO;
-import life.qbic.cli.model.geo.SampleGEO;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
+import life.qbic.cli.model.geo.SampleGEO;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -26,7 +27,7 @@ public class GEOExcelCreater {
 
     //Get first sheet from the workbook
     XSSFWorkbook wb;
-    wb = new XSSFWorkbook(new File("/Users/Timo/Documents/geo-uploader-cli/src/main/resources/geo_template.xlsx"));
+    wb = new XSSFWorkbook(new File("/home/tlucas/IdeaProjects/geo-uploader-cli/src/main/resources/geo_template.xlsx"));
     XSSFSheet sheet = (XSSFSheet) wb.getSheetAt(0);
 
     System.out.println("Writing " + samples.size() + " Samples to Excel File ...");
@@ -37,7 +38,11 @@ public class GEOExcelCreater {
       System.out.println("No samples found. Please check your input and try again.");
       System.exit(1);
     }
-    addSampleRows(sheet, samples);
+    try{
+    addSampleRows(sheet, samples);}
+    catch(ArrayIndexOutOfBoundsException e){}
+
+
 
     try {
       FileOutputStream out = new FileOutputStream(new File(outPath + fileName + ".xlsx"), false);
@@ -58,7 +63,7 @@ public class GEOExcelCreater {
     //For each row, iterate through each columns
     Iterator<Cell> cellIterator = sampleHeader.cellIterator();
     String charLabels = "";
-
+    if(samples.get(0).getCharacteristics() != null)
     for (String key : samples.get(0).getCharacteristics().keySet()) {
       charLabels = "characteristics: " + key + "\t" + charLabels;
     }
@@ -80,12 +85,13 @@ public class GEOExcelCreater {
     }
   }
 
-  private void addSampleRows(Sheet sheet, List<SampleGEO> samples) {
+  private void addSampleRows(Sheet sheet, List<SampleGEO> samples) throws ArrayIndexOutOfBoundsException {
     sheet.shiftRows(20, sheet.getLastRowNum(), samples.size() - 3);
     for (int i = 0; i < samples.size(); i++) {
       sheet.createRow(i + 20);
       for (int j = 0; j < sheet.getRow(19).getLastCellNum(); j++) {
         sheet.getRow(i + 20).createCell(j);
+
         sheet.getRow(i + 20).getCell(j).setCellValue(samples.get(i).getSampleRow()[j]);
       }
 
@@ -99,7 +105,8 @@ public class GEOExcelCreater {
       for (int j = 0; j < sheet.getRow(52).getLastCellNum() - 1; j++) {
         sheet.getRow(i + 53).createCell(j);
         try {
-        sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);}
+          sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);}
+
         catch(ArrayIndexOutOfBoundsException e){
           System.out.println("Array out of bounds");
         }

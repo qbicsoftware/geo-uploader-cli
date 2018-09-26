@@ -93,25 +93,29 @@ public class SampleGEO {
   }
 
   public String[] getSampleRow() {
-    String charLabels = "";
-    for (String key : characteristics.keySet()) {
-      charLabels = "characteristics: " + key + "\t" + charLabels;
-    }
+      String line = "";
+      String charLabels = "";
+      if (characteristics != null)
+          for (String key : characteristics.keySet()) {
+              charLabels = "characteristics: " + key + "\t" + charLabels;
+          }
 
-    String header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
-        + "molecule\tdescription\tprocessed data file\traw file";
+      String header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
+              + "molecule\tdescription\tprocessed data file\traw file";
 
-    String charValues = "";
-    for (String key : characteristics.keySet()) {
-      charValues = characteristics.get(key) + "\t" + charValues;
-    }
+      String charValues = "";
 
-    String line =
-        sampleName + "\t" + title.replace(" ", "") + "\t" + sourceName + "\t" + organism + "\t"
-            + charValues + molecule + "\t" + description + "\t" + processedDataFile + "\t"
-            + rawFile;
-    line = line.replace("null", "");
-    return line.split("\t");
-  }
+      if (characteristics != null)
+          for (String key : characteristics.keySet()) {
+              charValues = characteristics.get(key) + "\t" + charValues;
+          }
+      if (sampleName != null && sourceName != null && organism != null && molecule != null && description != null && processedDataFile != null) {
+          line =
+                  sampleName + "\t" + title.replace(" ", "") + "\t" + sourceName + "\t" + organism + "\t"
+                          + charValues + molecule + "\t" + description + "\t" + processedDataFile + "\t"
+                          + rawFile;
+          line = line.replace("null", "");}
+          return line.split("\t");
+      }
 
 }
