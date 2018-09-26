@@ -12,6 +12,7 @@ import life.qbic.cli.helper.GEOExcelCreater;
 import life.qbic.cli.helper.GEOOpenBisParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.io.*;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 /**
@@ -40,9 +41,44 @@ public class MainTool extends QBiCTool<MainCommand> {
     String password = "";
 
 
+  //read in password from file
+    // The name of the file to open.
+    String fileName = "temp.txt";
+
+    // This will reference one line at a time
+    String line = null;
+
+    try {
+      // FileReader reads text files in the default encoding.
+      FileReader fileReader =
+              new FileReader("pw.txt");
+
+      // Always wrap FileReader in BufferedReader.
+      BufferedReader bufferedReader =
+              new BufferedReader(fileReader);
+
+      while((line = bufferedReader.readLine()) != null) {
+        password = line;
+      }
+
+      // Always close files.
+      bufferedReader.close();
+    }
+    catch(FileNotFoundException ex) {
+      System.out.println(
+              "Unable to open file '" +
+                      fileName + "'");
+    }
+    catch(IOException ex) {
+      System.out.println(
+              "Error reading file '"
+                      + fileName + "'");
+      // Or we could just do this:
+      // ex.printStackTrace();
+    }
+
     IDataStoreServerApi dss = null;
     IApplicationServerApi app = null;
-
     // Connect to openBis
 
     try {
@@ -62,6 +98,7 @@ public class MainTool extends QBiCTool<MainCommand> {
       System.exit(1);
     }
 /*
+commented out while using ide to develop - delete comment when using cmd for starting program
     try {
       java.io.Console console = System.console();
       password = new String(console.readPassword("Password: "));
