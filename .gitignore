@@ -25,3 +25,6 @@ logs/
 
 # compiled Vaadin widgetsets
 src/main/webapp/VAADIN/widgetsets
+
+#file containign password
+/src/main/java/life/qbic/cli/main/MainTool.java

@@ -47,6 +47,8 @@
     </repository>
   </repositories>
 
+
+
   <dependencies>
     <dependency>
       <groupId>life.qbic</groupId>
@@ -84,7 +86,17 @@
       <version>3.0.0-alpha-4</version>
     </dependency>
 
+<dependency>
+    <groupId>org.apache.poi</groupId>
+    <artifactId>poi-ooxml</artifactId>
+    <version>3.17</version>
+</dependency>
+
+
+
+
   </dependencies>
+
 
   <build>
     <plugins>
@@ -113,3 +125,4 @@
     </plugins>
   </build>
 </project>
+
