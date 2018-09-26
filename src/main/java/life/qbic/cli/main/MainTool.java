@@ -12,6 +12,7 @@ import life.qbic.cli.helper.GEOExcelCreater;
 import life.qbic.cli.helper.GEOOpenBisParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 /**
  * Implementation of GEO Upload command-line Tool. Its command-line arguments are contained in
@@ -38,6 +39,7 @@ public class MainTool extends QBiCTool<MainCommand> {
 
     String password = "";
 
+
     IDataStoreServerApi dss = null;
     IApplicationServerApi app = null;
 
@@ -59,7 +61,7 @@ public class MainTool extends QBiCTool<MainCommand> {
       LOG.error("Could not connect to openBis");
       System.exit(1);
     }
-
+/*
     try {
       java.io.Console console = System.console();
       password = new String(console.readPassword("Password: "));
@@ -72,7 +74,7 @@ public class MainTool extends QBiCTool<MainCommand> {
       CredentialHandler ch = new CredentialHandler("/Users/spaethju/qbic-ext.properties");
       password = ch.getPw();
     }
-
+*/
     // login to obtain a session token
     String sessionToken = "";
     try {
@@ -98,6 +100,8 @@ public class MainTool extends QBiCTool<MainCommand> {
       System.out.println("Creating Excel file finished successfully.");
     } catch (IOException e) {
       LOG.error("Could not create excel file.");
+      e.printStackTrace();
+    } catch (InvalidFormatException e) {
       e.printStackTrace();
     }
 

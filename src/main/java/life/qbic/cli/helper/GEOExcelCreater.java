@@ -1,33 +1,33 @@
 package life.qbic.cli.helper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
 import life.qbic.cli.model.geo.RawDataGEO;
 import life.qbic.cli.model.geo.SampleGEO;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+
 
 public class GEOExcelCreater {
 
   public GEOExcelCreater(List<SampleGEO> samples, List<RawDataGEO> raws, String outPath,
-      String fileName) throws IOException {
-    InputStream in = getClass().getResourceAsStream("/geo_template.xls");
+      String fileName) throws IOException, InvalidFormatException {
+    //InputStream in = getClass().getResourceAsStream("/geo_template.xlsx");
 
     //Get first sheet from the workbook
-    Workbook wb = new HSSFWorkbook(in);
-    HSSFSheet sheet = (HSSFSheet) wb.getSheetAt(0);
+    XSSFWorkbook wb;
+    wb = new XSSFWorkbook(new File("/Users/Timo/Documents/geo-uploader-cli/src/main/resources/geo_template.xlsx"));
+    XSSFSheet sheet = (XSSFSheet) wb.getSheetAt(0);
 
     System.out.println("Writing " + samples.size() + " Samples to Excel File ...");
     addRawFilesRows(sheet, raws);
@@ -40,7 +40,7 @@ public class GEOExcelCreater {
     addSampleRows(sheet, samples);
 
     try {
-      FileOutputStream out = new FileOutputStream(new File(outPath + fileName + ".xls"), false);
+      FileOutputStream out = new FileOutputStream(new File(outPath + fileName + ".xlsx"), false);
       wb.write(out);
       out.close();
       System.out.println("Your file was written successfully! Good bye :-)");
@@ -98,7 +98,11 @@ public class GEOExcelCreater {
       sheet.createRow(i + 53);
       for (int j = 0; j < sheet.getRow(52).getLastCellNum() - 1; j++) {
         sheet.getRow(i + 53).createCell(j);
-        sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
+        try {
+        sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);}
+        catch(ArrayIndexOutOfBoundsException e){
+          System.out.println("Array out of bounds");
+        }
       }
 
     }

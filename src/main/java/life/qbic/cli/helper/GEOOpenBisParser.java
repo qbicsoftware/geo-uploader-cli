@@ -162,8 +162,10 @@ public class GEOOpenBisParser {
       rawGeo.setInstrumentModel(
           rawDataSample.getExperiment().getProperty("Q_SEQUENCER_DEVICE").replace("_", " ")
               .replace("IMGAG", "").trim());
+      //Check if sample has sequecing_mode
+      if(rawDataSample.getExperiment().getProperty("Q_SEQUENCING_MODE")!= null){
       rawGeo.setSingleOrPairedEnd(
-          rawDataSample.getExperiment().getProperty("Q_SEQUENCING_MODE").replace("_", "-"));
+          rawDataSample.getExperiment().getProperty("Q_SEQUENCING_MODE").replace("_", "-"));}
       DataSetFileSearchCriteria criteria = new DataSetFileSearchCriteria();
       criteria.withDataSet().withSample().withCode().thatEquals(rawDataSample.getCode());
       SearchResult<DataSetFile> files = dss
@@ -204,26 +206,28 @@ public class GEOOpenBisParser {
     for (Sample extractedSample : extractedSamples.getObjects()) {
       for (SampleGEO geo : sampleGEOList) {
         extractedSample.getProperties();
-        if (geo.getTitle().contains(extractedSample.getProperty("Q_SECONDARY_NAME"))) {
-          geo.setSourceName(extractedSample.getProperty("Q_PRIMARY_TISSUE")
-              + "_" + extractedSample.getProperty("Q_TISSUE_DETAILED"));
-          VocabularyTermSearchCriteria vocabularyTermSearchCriteria = new VocabularyTermSearchCriteria();
-          vocabularyTermSearchCriteria.withCode()
-              .thatEquals(extractedSample.getProperty("Q_TISSUE_DETAILED"));
-          SearchResult<VocabularyTerm> vocabularyTermSearchResult = app
-              .searchVocabularyTerms(sessionToken, vocabularyTermSearchCriteria,
-                  new VocabularyTermFetchOptions());
-          for (VocabularyTerm vocabularyTerm : vocabularyTermSearchResult.getObjects()) {
-            if (vocabularyTerm.getCode().equals(extractedSample.getProperty("Q_TISSUE_DETAILED"))) {
-              geo.setSourceName(vocabularyTerm.getDescription());
+        if(extractedSample.getProperty("Q_SECONDARY_NAME") != null && geo.getTitle() != null)
+          if (geo.getTitle().contains(extractedSample.getProperty("Q_SECONDARY_NAME"))) {
+            geo.setSourceName(extractedSample.getProperty("Q_PRIMARY_TISSUE")
+                    + "_" + extractedSample.getProperty("Q_TISSUE_DETAILED"));
+            VocabularyTermSearchCriteria vocabularyTermSearchCriteria = new VocabularyTermSearchCriteria();
+            vocabularyTermSearchCriteria.withCode()
+                    .thatEquals(extractedSample.getProperty("Q_TISSUE_DETAILED"));
+            SearchResult<VocabularyTerm> vocabularyTermSearchResult = app
+                    .searchVocabularyTerms(sessionToken, vocabularyTermSearchCriteria,
+                            new VocabularyTermFetchOptions());
+            for (VocabularyTerm vocabularyTerm : vocabularyTermSearchResult.getObjects()) {
+              if (vocabularyTerm.getCode().equals(extractedSample.getProperty("Q_TISSUE_DETAILED"))) {
+                geo.setSourceName(vocabularyTerm.getDescription());
+              }
             }
           }
-        }
       }
     }
 
     for (Sample sampleSource : sampleSources.getObjects()) {
       for (SampleGEO geo : sampleGEOList) {
+        if(geo.getTitle() != null)
         if (geo.getTitle().equals(sampleSource.getProperty("Q_SECONDARY_NAME"))) {
           geo.setOrganism(sampleSource.getProperty("Q_NCBI_ORGANISM"));
           //TODO hard coded
