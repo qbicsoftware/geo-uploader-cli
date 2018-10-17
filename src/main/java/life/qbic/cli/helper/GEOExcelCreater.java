@@ -85,13 +85,13 @@ public class GEOExcelCreater {
     }
   }
 
-  private void addSampleRows(Sheet sheet, List<SampleGEO> samples) throws ArrayIndexOutOfBoundsException {
+  private void addSampleRows(Sheet sheet, List<SampleGEO> samples) {
     sheet.shiftRows(20, sheet.getLastRowNum(), samples.size() - 3);
     for (int i = 0; i < samples.size(); i++) {
       sheet.createRow(i + 20);
       for (int j = 0; j < sheet.getRow(19).getLastCellNum(); j++) {
         sheet.getRow(i + 20).createCell(j);
-
+        System.out.println(samples.get(i).getSampleRow()[j]);
         sheet.getRow(i + 20).getCell(j).setCellValue(samples.get(i).getSampleRow()[j]);
       }
 

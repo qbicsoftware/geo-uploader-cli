@@ -31,4 +31,7 @@ public class MainCommand extends AbstractCommand {
   public String project;
   @Option(names = {"-o", "--out"}, required = true, description = "The output directory.")
   public String output;
+  @Option(names = {"-m","--md5checksum"},description = "Download sample files and calculate md5 checksum.")
+  public Boolean md5;
+
 }

@@ -16,8 +16,8 @@ import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.DataSetFile;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.fetchoptions.DataSetFileFetchOptions;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.search.DataSetFileSearchCriteria;
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import life.qbic.cli.model.geo.RawDataGEO;
 import life.qbic.cli.model.geo.SampleGEO;
+import java.security.DigestInputStream;
 
 public class GEOOpenBisParser {
 
@@ -170,17 +171,32 @@ public class GEOOpenBisParser {
       criteria.withDataSet().withSample().withCode().thatEquals(rawDataSample.getCode());
       SearchResult<DataSetFile> files = dss
           .searchFiles(sessionToken, criteria, new DataSetFileFetchOptions());
-      for (DataSetFile file : files.getObjects()) {
-        if (file.getPermId().toString().contains(".fastq")) {
+      for (DataSetFile file : files.getObjects())
+        if (file.getPermId().toString().contains(".fastq") && !file.getPermId().toString().contains(".sha256sum") && !file.getPermId().toString().contains("origlabfilename")) {
           String[] path = file.getPermId().toString().split("/");
-          //TODO wrong md5 checksum
-          //computeMd5(file, rawGeo);
+
           geo.setRawFile(path[path.length - 1]);
           rawGeo.setFileName(geo.getRawFile());
+
+
+          //TODO wrong md5 checksum
+          //computeMd5(file, rawGeo);
+
+          String rawFileName = rawGeo.getFileName();
+          String md5 = "";
+          try (FileInputStream fis = new FileInputStream(new File("/home/tlucas/Downloads/"+rawFileName))) {
+            md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(String.valueOf(fis));
+          }
+          catch(FileNotFoundException e) {
+            System.out.println("Could not create checksum for file " + rawFileName);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          rawGeo.setFileChecksum(md5);
+
           //TODO hard coded
           rawGeo.setFileType("fastq");
         }
-      }
       sampleGEOList.add(geo);
       rawDataGEOList.add(rawGeo);
     }
