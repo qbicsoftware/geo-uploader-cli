@@ -1,5 +1,4 @@
 package life.qbic.cli.model.geo;
-
 public class RawDataGEO {
 
   private String fileName,
@@ -61,9 +60,16 @@ public class RawDataGEO {
     this.singleOrPairedEnd = singleOrPairedEnd;
   }
 
+  public String checkNull(String s) {
+    if (s == null)
+      return ("Not Specified");
+    else
+      return (s);
+  }
+
   public String[] getRawFilesRow() {
-    String line = fileName + "\t" + fileType + "\t" + fileChecksum + "\t" + instrumentModel + "\t"
-        + readLength + "\t" + singleOrPairedEnd;
+    String line = checkNull(fileName )+ "\t" + checkNull(fileType )+ "\t" + checkNull(fileChecksum )+ "\t" + checkNull(instrumentModel )+ "\t"
+        + checkNull(readLength )+ "\t" + checkNull(singleOrPairedEnd);
     line = line.replace("null", "");
     return line.split("\t");
   }

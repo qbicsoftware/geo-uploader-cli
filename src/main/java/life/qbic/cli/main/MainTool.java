@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import life.qbic.cli.QBiCTool;
-import life.qbic.cli.connection.CredentialHandler;
 import life.qbic.cli.helper.GEOExcelCreater;
 import life.qbic.cli.helper.GEOOpenBisParser;
 import org.apache.logging.log4j.LogManager;
@@ -79,7 +78,25 @@ public class MainTool extends QBiCTool<MainCommand> {
 
     IDataStoreServerApi dss = null;
     IApplicationServerApi app = null;
+
+    if (command.md5 == true) {
+      System.out.println("Downloading sample files ");
+      // Run a java app in a separate system process
+      Process proc = null;
+      try {
+        proc = Runtime.getRuntime().exec("java -jar postman-cli-0.3.0.jar QGVIN -u zxmvi59");
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+// Then retreive the process output
+      InputStream in = proc.getInputStream();
+      InputStream err = proc.getErrorStream();}
+
+
     // Connect to openBis
+
+
+
 
     try {
       // Reference the DSS
@@ -122,13 +139,19 @@ commented out while using ide to develop - delete comment when using cmd for sta
     }
 
     // Parse space
+    System.out.println(command.md5);
     GEOOpenBisParser geoParser = new GEOOpenBisParser(command.project, command.userName,
         sessionToken,
         app, dss);
     HashMap<String, List> geo = geoParser.parseSingle();
 
+
+
     // logout to release the resources related with the session
     app.logout(sessionToken);
+
+    //Download samples with qpostman and calculate md5checksum
+
 
     // Create excel from template
     try {
