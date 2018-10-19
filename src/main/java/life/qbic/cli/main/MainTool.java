@@ -1,11 +1,14 @@
 package life.qbic.cli.main;
 
 import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
+import ch.ethz.sis.openbis.generic.asapi.v3.dto.dataset.DataSet;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.systemsx.cisd.common.spring.HttpInvokerUtils;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+
+import life.qbic.QbicDataLoader;
 import life.qbic.cli.QBiCTool;
 import life.qbic.cli.helper.GEOExcelCreater;
 import life.qbic.cli.helper.GEOOpenBisParser;
@@ -79,24 +82,51 @@ public class MainTool extends QBiCTool<MainCommand> {
     IDataStoreServerApi dss = null;
     IApplicationServerApi app = null;
 
-    if (command.md5 == true) {
+    //Use postman to download sample files if -m parameter is given
+
+    if (command.md5 != null) {
       System.out.println("Downloading sample files ");
-      // Run a java app in a separate system process
-      Process proc = null;
-      try {
-        proc = Runtime.getRuntime().exec("java -jar postman-cli-0.3.0.jar QGVIN -u zxmvi59");
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-// Then retreive the process output
-      InputStream in = proc.getInputStream();
-      InputStream err = proc.getErrorStream();}
+
+      QbicDataLoader loader = new QbicDataLoader("https://qbis.qbic.uni-tuebingen.de/openbis/openbis","https://qbis.qbic.uni-tuebingen.de:444/datastore_server",
+              "zxmvi59",password,1024,"");
+        int returnCode = loader.login();
+        LOG.info(String.format("OpenBis login returned with %s", returnCode));
+        if (returnCode != 0) {
+            LOG.error("Connection to openBIS failed.");
+            System.exit(1);
+        }
+        LOG.info("Connection to openBIS was successful.");      loader.findAllDatasetsRecursive("QJWABENTITY-1");
+
+        List<DataSet> foundDataSets = loader.findAllDatasetsRecursive("QJWABENTITY-1");
+
+        LOG.info(String.format("Number of data sets found: %s", foundDataSets.size()));
+
+        if (foundDataSets.size() > 0) {
+            LOG.info("Initialize download ...");
+            int datasetDownloadReturnCode = -1;
+            try {
+                datasetDownloadReturnCode = loader.downloadDataset(foundDataSets);
+            } catch (NullPointerException e) {
+                LOG.error("Datasets were found by the application server, but could not be found on the datastore server for "
+                        + "QJWABENTITY-1" + "." + " Try to supply the correct datastore server using a config file!");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (datasetDownloadReturnCode != 0) {
+                LOG.error("Error while downloading dataset: " + "QJWABENTITY-1");
+            } else {
+                LOG.info("Download successfully finished.");
+            }
+
+        } else {
+            LOG.info("Nothing to download.");
+        }
+
+    }
 
 
     // Connect to openBis
-
-
-
 
     try {
       // Reference the DSS
