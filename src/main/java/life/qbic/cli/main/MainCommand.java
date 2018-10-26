@@ -1,5 +1,6 @@
 package life.qbic.cli.main;
 
+import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.id.IDataSetFileId;
 import life.qbic.cli.AbstractCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -33,5 +34,7 @@ public class MainCommand extends AbstractCommand {
   public String output;
   @Option(names = {"-m","--md5checksum"},description = "Download sample files and calculate md5 checksum.")
   public Boolean md5;
+  @Option(names = {"-f","--file"},description = "Path to a file containing the sample identifiers for downloading the samples.")
+  public String identifierPath;
 
 }

@@ -215,8 +215,8 @@ public class GEOOpenBisParser {
 
 
                     rawFileName = rawGeo.getFileName();
-                    //String md5 = computeMd5(rawFileName);
-                    //rawGeo.setFileChecksum(md5);
+                    String md5 = computeMd5(rawFileName);
+                    rawGeo.setFileChecksum(md5);
 
 
                     //Check if sample has sequecing_mode if it has not then
