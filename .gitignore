@@ -30,4 +30,4 @@ src/main/webapp/VAADIN/widgetsets
 /src/main/java/life/qbic/cli/main/MainTool.java
 
 #sample fastq files
-.fastq.gz
+samples/
