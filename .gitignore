@@ -22,7 +22,8 @@ logs/
 
 # Other
 **/.factorypath
-
+#file for testing
+pw.txt
 # compiled Vaadin widgetsets
 src/main/webapp/VAADIN/widgetsets
 
