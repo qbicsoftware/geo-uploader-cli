@@ -43,6 +43,7 @@ Output Path: Path to were the output should be generated
 
 The following OpenBis identifiers need are used to parse the information that is needed for the tool to run.
 If any of this information is not provided the program's output will be incomplete and will need manual adjustment.
+This information is stored on the openBis server and you may need to contact the administrator to get access to it.
 
 The following fields need to be filled out for each sample:
 
