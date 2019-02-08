@@ -22,7 +22,7 @@ Use java -cp to run the program.
 Usage:
 
 ```console
-java -cp geo-uploader-cli.jar life.qbic.cli.main.MainEntryPoint -u [ZDV Login] -p [Project Identifier] -o [Output Path]
+java -cp geo-uploader-cli.jar [Main Class] -u [ZDV Login] -p [Project Identifier] -o [Output Path]
 ```
 
 ```console
