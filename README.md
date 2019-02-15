@@ -28,14 +28,14 @@ java -cp geo-uploader-cli.jar [Main Class] -u [ZDV Login] -p [Project Identifier
 Example usage:
 
 ```console
-java -cp geo-uploader-cli.jar life.qbic.cli.main.MainEntryPoint -u zxmvi59 -p QGVIN -o output/
+java -cp geo-uploader-cli.jar life.qbic.cli.main.MainEntryPoint -u [ZDV Login] -p [Projcet Identifier] -o output/
 ```
 
 Main Class: The main class of the java project. You can use life.qbic.cli.main.MainEntryPoint
 
 ZDV Login: Username for login to openBis. In my case this is the ZDV login ID.
 
-Project Identifier: Identifier of the QBiC project e.g. QMCKA
+Project Identifier: Identifier of the QBiC project
 
 Output Path: Path to were the output should be generated
 
