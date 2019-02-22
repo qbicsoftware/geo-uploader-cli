@@ -58,3 +58,26 @@ The following fields need to be filled out for each sample:
 * Q_PRIMARY_TISSUE
 * Q_NCBI_ORGANISM
 
+## Config.yaml
+
+Many properties of this CLI can be changed. For this you need to provide a config file.
+The config file needs to look like this:
+
+```yaml
+#Information needed to connect ot openbis
+---
+app: [openBis appserver adress]
+dss: [openBis dss server adress]
+username: [openBis login username]
+password: [openBis login password]
+
+# Then enter Information needed for parsing. These are the default identifiers that are parsed from openBis and writen to the excel sheet. Change the identifiers to access different information from openBis
+organism: Q_NCBI_ORGANISM
+source_name: Q_PRIMARY_TISSUE
+source_name_detailed: Q_TISSUE_DETAILED
+title: Q_SECONDARY_NAME
+molecule: Q_SAMPLE_TYPE
+characteristics: Q_PROPERTIES
+property: qcategorical
+experiment: Q_SEQUENCING_MODE
+```
