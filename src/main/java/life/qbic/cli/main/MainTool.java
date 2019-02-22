@@ -4,18 +4,26 @@ import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
 import ch.ethz.sis.openbis.generic.asapi.v3.dto.dataset.DataSet;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.systemsx.cisd.common.spring.HttpInvokerUtils;
-
+import life.qbic.cli.connection.CredentialHandler;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-
 import life.qbic.QbicDataLoader;
+import life.qbic.cli.model.geo.Config;
 import life.qbic.cli.QBiCTool;
 import life.qbic.cli.helper.GEOExcelCreater;
 import life.qbic.cli.helper.GEOOpenBisParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.io.File;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.*;
 
@@ -26,6 +34,12 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
  * instances of {@link MainCommand}.
  */
 public class MainTool extends QBiCTool<MainCommand> {
+
+
+
+    private ArrayList<String> parsingConfig;
+    private GEOOpenBisParser geoParser;
+    private Config config;
 
     public Boolean checkIfFileInFolder(String path, String identifier) {
         File folder = new File(path);
@@ -56,6 +70,7 @@ public class MainTool extends QBiCTool<MainCommand> {
 
     @Override
     public void execute() {
+
         // get the parsed command-line arguments
         final MainCommand command = super.getCommand();
         LOG.info("Parse commands");
@@ -63,39 +78,8 @@ public class MainTool extends QBiCTool<MainCommand> {
         String password = "";
 
 
-        //read in password from file
-        // The name of the file to open.
-        String fileName = "temp.txt";
 
-        // This will reference one line at a time
-        String line = null;
-
-        try {
-            // FileReader reads text files in the default encoding.
-            FileReader fileReader =
-                    new FileReader("pw.txt");
-
-            // Always wrap FileReader in BufferedReader.
-            BufferedReader bufferedReader =
-                    new BufferedReader(fileReader);
-
-            while ((line = bufferedReader.readLine()) != null) {
-                password = line;
-            }
-
-            // Always close files.
-            bufferedReader.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println(
-                    "Unable to open file '" +
-                            fileName + "'");
-        } catch (IOException ex) {
-            System.out.println(
-                    "Error reading file '"
-                            + fileName + "'");
-            // Or we could just do this:
-            // ex.printStackTrace();
-        }
+        config = parseConfig(command.configPath);
 
         IDataStoreServerApi dss = null;
         IApplicationServerApi app = null;
@@ -106,7 +90,7 @@ public class MainTool extends QBiCTool<MainCommand> {
             System.out.println("Downloading sample files ");
 
             QbicDataLoader loader = new QbicDataLoader("https://qbis.qbic.uni-tuebingen.de/openbis/openbis", "https://qbis.qbic.uni-tuebingen.de:444/datastore_server",
-                    "zxmvi59", password, 4*1024, "");
+                    command.userName, password, 4 * 1024, "");
             int returnCode = loader.login();
             LOG.info(String.format("OpenBis login returned with %s", returnCode));
             if (returnCode != 0) {
@@ -118,15 +102,15 @@ public class MainTool extends QBiCTool<MainCommand> {
 
             //now get all identifiers using a file containing the identifiers
             ArrayList<String> identifiers;
-            identifiers = new ArrayList<String>();
-
+            identifiers = new ArrayList<>();
+            String l;
             try {
                 File file = new File("identifiers");
                 FileReader fileReader = new FileReader(file);
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-                while ((line = bufferedReader.readLine()) != null) {
-                    identifiers.add(line);
+                while ((l = bufferedReader.readLine()) != null) {
+                    identifiers.add(l);
                 }
                 fileReader.close();
                 System.out.println("Contents of file:");
@@ -169,39 +153,46 @@ public class MainTool extends QBiCTool<MainCommand> {
         }
 
 
+
 // Connect to openBis
 
         try {
             // Reference the DSS
             dss =
                     HttpInvokerUtils.createStreamSupportingServiceStub(IDataStoreServerApi.class,
-                            "https://qbis.qbic.uni-tuebingen.de:444/datastore_server"
+                            config.getDss()
                                     + IDataStoreServerApi.SERVICE_URL, 10000);
 
             // get a reference to AS API
             app = HttpInvokerUtils.createServiceStub(IApplicationServerApi.class,
-                    "https://qbis.qbic.uni-tuebingen.de/openbis/openbis" + IApplicationServerApi.SERVICE_URL,
+                    config.getApp() + IApplicationServerApi.SERVICE_URL,
                     10000);
             LOG.info("openBis connection established");
         } catch (Exception e) {
             LOG.error("Could not connect to openBis");
             System.exit(1);
         }
-/*
-commented out while using ide to develop - delete comment when using cmd for starting program
-    try {
-      java.io.Console console = System.console();
-      password = new String(console.readPassword("Password: "));
-      if (password.isEmpty()) {
-        System.out.println("You need to provide a password");
-        LOG.error("No password provided");
-        System.exit(1);
-      }
-    }catch (NullPointerException e) {
-      CredentialHandler ch = new CredentialHandler("/Users/spaethju/qbic-ext.properties");
-      password = ch.getPw();
-    }
-*/
+
+//Get the password for openBis login. If not provided in the config.yaml the user can enter it in the command line
+        if(config.getPassword() == null) {
+        try {
+            java.io.Console console = System.console();
+            password = new String(console.readPassword("Password: "));
+            if (password.isEmpty()) {
+                System.out.println("You need to provide a password");
+                LOG.error("No password provided");
+                System.exit(1);
+            }
+        } catch (NullPointerException e) {
+
+            CredentialHandler ch = new CredentialHandler("credentialProperties");
+            password = ch.getPw();
+        }}
+
+        else{
+            password = config.getPassword();
+        }
+
         // login to obtain a session token
         String sessionToken = "";
         try {
@@ -211,11 +202,13 @@ commented out while using ide to develop - delete comment when using cmd for sta
             LOG.error("Could not log in to openBis. Please check your username and password");
         }
 
-        // Parse space
-        System.out.println(command.md5);
-        GEOOpenBisParser geoParser = new GEOOpenBisParser(command.project, command.userName,
-                sessionToken,
-                app, dss);
+        //If a openBis parsing config is given then the keywords in it will be used for parsing the openBis data
+
+        geoParser = new GEOOpenBisParser(command.project,command.userName,sessionToken,app,dss);
+
+
+
+
         HashMap<String, List> geo = geoParser.parseSingle();
 
 
@@ -223,7 +216,6 @@ commented out while using ide to develop - delete comment when using cmd for sta
         app.logout(sessionToken);
 
         //Download samples with qpostman and calculate md5checksum
-
 
         // Create excel from template
         try {
@@ -235,10 +227,33 @@ commented out while using ide to develop - delete comment when using cmd for sta
             e.printStackTrace();
         } catch (InvalidFormatException e) {
             e.printStackTrace();
+
         }
 
 
     }
 
+
+    public Config parseConfig(String configpath) {
+        Config config = new Config();
+
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+        try {
+            config = mapper.readValue(new File(configpath), Config.class);
+
+
+
+
+        } catch (Exception e) {
+
+            // TODO Auto-generated catch block
+
+           e.printStackTrace();
+
+        }
+    return config;}
     // TODO: override the shutdown() method if you are implementing a daemon and want to take advantage of a shutdown hook for clean-up tasks
+
+
 }
