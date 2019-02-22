@@ -32,9 +32,16 @@ public class MainCommand extends AbstractCommand {
   public String project;
   @Option(names = {"-o", "--out"}, required = true, description = "The output directory.")
   public String output;
+  @Option(names = {"-c", "--config"}, required = true, description = "Path to a file containing an openBis parsing config.")
+  public String configPath;
   @Option(names = {"-m","--md5checksum"},description = "Download sample files and calculate md5 checksum.")
   public Boolean md5;
   @Option(names = {"-f","--file"},description = "Path to a file containing the sample identifiers for downloading the samples.")
   public String identifierPath;
+
+
+  public MainCommand() {
+
+  }
 
 }

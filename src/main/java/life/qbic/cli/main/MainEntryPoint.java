@@ -3,6 +3,8 @@ package life.qbic.cli.main;
 import life.qbic.cli.ToolExecutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
  * Entry point for the GEO Upload command-line Tool application.

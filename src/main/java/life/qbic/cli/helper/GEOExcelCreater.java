@@ -1,34 +1,34 @@
 package life.qbic.cli.helper;
 
 import life.qbic.cli.model.geo.RawDataGEO;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
+import org.apache.poi.ss.usermodel.*;
 import life.qbic.cli.model.geo.SampleGEO;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
-
+import java.io.FileOutputStream;
 
 public class GEOExcelCreater {
 
     public GEOExcelCreater(List<SampleGEO> samples, List<RawDataGEO> raws, String outPath,
                            String fileName) throws IOException, InvalidFormatException {
-        //InputStream in = getClass().getResourceAsStream("/geo_template.xlsx");
+        //InputStream in = getClass().getResourceAsStream("geo_template.xlsx");
+
+        //XSSFWorkbook wb = new XSSFWorkbook(in);
+        XSSFWorkbook wb = new XSSFWorkbook("geo_template.xlsx");
 
         //Get first sheet from the workbook
-        XSSFWorkbook wb;
-        wb = new XSSFWorkbook(new File("geo_template.xlsx"));
-        XSSFSheet sheet = (XSSFSheet) wb.getSheetAt(0);
+        XSSFSheet sheet = wb.getSheetAt(0);
 
         System.out.println("Writing " + samples.size() + " Samples to Excel File ...");
         //Add raw names to paired end experiments column if project uses paired end data
@@ -60,6 +60,8 @@ public class GEOExcelCreater {
             wb.write(out);
             out.close();
             System.out.println("Your file was written successfully! Good bye :-)");
+
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,7 +120,6 @@ public class GEOExcelCreater {
                 try {
                     sheet.getRow(i + 60).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Array out of bounds");
                 }
             }
 
@@ -134,7 +135,6 @@ public class GEOExcelCreater {
                 try {
                     sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Array out of bounds");
                 }
             }
 
