@@ -73,7 +73,7 @@ Example Config file:
 app: [Application server adress] https://********/*****/****
 dss: https://****.****.*******.**/[port]/********
 username: [openBis login name]
-password: [openBis password] if this is empty the CLI will ask for the password at the start of the program
+password: [openBis password] #if this is empty the CLI will ask for the password at the start of the program
 
 organism: Q_NCBI_ORGANISM
 source_name: Q_PRIMARY_TISSUE
