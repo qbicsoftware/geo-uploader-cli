@@ -1,0 +1,8 @@
+Organism: Q_NCBI_ORGANISM
+Source Name: Q_PRIMARY_TISSUE
+Source Name: Q_TISSUE_DETAILED
+Title: Q_SECONDARY_NAME
+Molecule: Q_SAMPLE_TYPE
+Characteristics: Q_PROPERTIES
+property: qcategorical
+Experiment: Q_SEQUENCING_MODE
