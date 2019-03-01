@@ -28,7 +28,7 @@ java -cp geo-uploader-cli.jar [Main Class] -u [ZDV Login] -p [Project Identifier
 Example usage:
 
 ```console
-java -cp geo-uploader-cli.jar life.qbic.cli.main.MainEntryPoint -u zxmvi59 -p QGVIN -o output/
+java -cp geo-uploader-cli.jar life.qbic.cli.main.MainEntryPoint -u [openbis id] -p [project ID] -o output/
 ```
 
 Main Class: The main class of the java project. You can use life.qbic.cli.main.MainEntryPoint
