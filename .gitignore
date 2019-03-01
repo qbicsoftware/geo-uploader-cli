@@ -5,7 +5,7 @@
 
 # VS Code
 .vscode
- 
+
 # Intellij
 .idea/
 *.iml
@@ -22,6 +22,13 @@ logs/
 
 # Other
 **/.factorypath
-
+#file for testing
+pw.txt
 # compiled Vaadin widgetsets
 src/main/webapp/VAADIN/widgetsets
+
+#file containign password
+/src/main/java/life/qbic/cli/main/MainTool.java
+
+#sample fastq files
+samples/
