@@ -32,6 +32,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 /**
  * Implementation of GEO Upload command-line Tool. Its command-line arguments are contained in
  * instances of {@link MainCommand}.
+ * This class starts the main functionality of the CLI, instantiates the most important objects and calls most methods
  */
 public class MainTool extends QBiCTool<MainCommand> {
 
