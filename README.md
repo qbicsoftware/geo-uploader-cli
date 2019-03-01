@@ -23,7 +23,7 @@ Use java -cp to run the program.
 Usage:
 
 ```console
-java -cp geo-uploader-cli.jar [Main Class] -u [ZDV Login] -p [Project Identifier] -o [Output Path]
+java -cp geo-uploader-cli.jar [Main Class] -u [ZDV Login] -p [Project Identifier] -o [Output Path] -c [Path to config]
 ```
 Example usage:
 
@@ -38,6 +38,12 @@ ZDV Login: Username for login to openBis. In my case this is the ZDV login ID.
 Project Identifier: Identifier of the QBiC project e.g. QMCKA
 
 Output Path: Path to were the output should be generated
+
+# Optional Parameters
+
+-md: Set this parameter to compute the md5 checksums of the raw files and write them to the excel file
+
+
 
 ## OpenBis Identifiers
 
@@ -57,3 +63,24 @@ The following fields need to be filled out for each sample:
 * Q_PRIMARY_TISSUE
 * Q_NCBI_ORGANISM
 
+## Config File
+
+-c [Path to config.yaml]: Provide a config file that includes login information as well as the openBis identifiers that are parsed to the excel file. All the fields except for the password have to be filled out in order for the program to run
+
+Example Config file:
+
+```yaml
+app: [Application server adress] https://********/*****/****
+dss: https://****.****.*******.**/[port]/********
+username: [openBis login name]
+password: [openBis password] #if this is empty the CLI will ask for the password at the start of the program
+
+organism: Q_NCBI_ORGANISM
+source_name: Q_PRIMARY_TISSUE
+source_name_detailed: Q_TISSUE_DETAILED
+title: Q_SECONDARY_NAME
+molecule: Q_SAMPLE_TYPE
+characteristics: Q_PROPERTIES
+property: qcategorical
+experiment: Q_SEQUENCING_MODE
+```
