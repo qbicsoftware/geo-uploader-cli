@@ -32,3 +32,5 @@ src/main/webapp/VAADIN/widgetsets
 
 #sample fastq files
 samples/
+
+classes/

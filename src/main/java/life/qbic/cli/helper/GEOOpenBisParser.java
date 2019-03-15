@@ -26,35 +26,22 @@ import life.qbic.cli.model.geo.Config;
 
 public class GEOOpenBisParser {
 
-    public String rawFileName;
-    public String spaceCode, projectCode, sessionToken, username;
-    public IApplicationServerApi app;
-    public IDataStoreServerApi dss;
-    public Project project = null;
-    public Config config;
-    private String organism =  "Q_NCBI_ORGANISM";
-    private String sourceName = "Q_PRIMARY_TISSUE";
-    private String sourceNameDetailed = "Q_TISSUE_DETAILED";
-    private String title = "Q_SECONDARY_NAME";
-    private String  molecule = "Q_SAMPLE_TYPE";
-    private String  characteristics = "Q_PROPERTIES";
-    private String  property = "qcategorical";
-    private String  experiment= "Q_SEQUENCING_MODE";
-
-    public GEOOpenBisParser(String projectCode, String username, String sessionToken,
-                            IApplicationServerApi app, IDataStoreServerApi dss) {
-
-        System.out.println("Normal constructor");
-        this.projectCode = projectCode;
-        this.username = username;
-        this.sessionToken = sessionToken;
-        this.app = app;
-        this.dss = dss;
-
-        checkSpaceAvailability();
+    private String rawFileName;
+    private String spaceCode, projectCode, sessionToken, username;
+    private IApplicationServerApi app;
+    private IDataStoreServerApi dss;
+    private Project project = null;
+    private Config config;
+    private String organism;
+    private String sourceName;
+    private String sourceNameDetailed;
+    private String title;
+    private String  molecule;
+    private String  characteristics;
+    private String  property;
+    private String  experiment;
 
 
-    }
 
     public GEOOpenBisParser(String projectCode, String username, String sessionToken,
                             IApplicationServerApi app, IDataStoreServerApi dss, Config config)
@@ -73,12 +60,18 @@ public class GEOOpenBisParser {
         checkSpaceAvailability();
 
 
+        organism = "Q_NCBI_ORGANISM";
         this.organism = config.getOrganism();
+        sourceName = "Q_PRIMARY_TISSUE";
         this.sourceName= config.getSource_name();
+        sourceNameDetailed = "Q_TISSUE_DETAILED";
         this.sourceNameDetailed = config.getSource_name_detailed();
         this.title = config.getTitle();
+        molecule = "Q_SAMPLE_TYPE";
         this.molecule = config.getMolecule();
+        characteristics = "Q_PROPERTIES";
         this.characteristics = config.getCharacteristics();
+        property = "qcategorical";
         this.property = config.getProperty();
         this.experiment = config.getExperiment();
 
@@ -87,13 +80,13 @@ public class GEOOpenBisParser {
     }
 
 
-    public String checkNull(String s) {
+    private String checkNull(String s) {
         if (s == null)
             return ("Not specified");
         else
             return (s);
     }
-    public static Map<String, String> parseProperty(String xml, String property) {
+    private static Map<String, String> parseProperty(String xml, String property) {
         HashMap<String, String> properties = new HashMap<>();
         ArrayList<String> lines = new ArrayList<>(Arrays.asList(xml.split("\n")));
         for (String line : lines) {
@@ -111,7 +104,7 @@ public class GEOOpenBisParser {
 
     public static byte[] getBytesOfMd5(InputStream is) throws IOException {
         byte[] buffer = new byte[1024];
-        MessageDigest complete = null;
+        MessageDigest complete;
         try {
             complete = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
@@ -134,7 +127,7 @@ public class GEOOpenBisParser {
     //
     //}
 
-    public void checkSpaceAvailability() {
+    private void checkSpaceAvailability() {
         // invoke other API methods using the session token, for instance search for spaces
         ProjectSearchCriteria projectSearchCriteria = new ProjectSearchCriteria();
         projectSearchCriteria.withCode().thatEquals(projectCode);
@@ -260,19 +253,15 @@ public class GEOOpenBisParser {
 
                     //Check if sample has sequecing_mode if it has not then
                     // determine sequencing mode checking for R1 in raw data name
-                        if (rawFileName != null)
                             if (rawFileName.contains("_R1") || rawFileName.contains("_R2"))  {
                                 rawGeo.setSingleOrPairedEnd("Paired End");
 
 
-                            } else {if(rawFileName != null)
-                                    rawGeo.setSingleOrPairedEnd("Single End");
+                            } else {
+                                rawGeo.setSingleOrPairedEnd("Single End");
                             }
 
-                    if (rawDataSample.getExperiment().getProperty(this.experiment) != null) {
-                        rawGeo.setSingleOrPairedEnd(
-                                rawDataSample.getExperiment().getProperty(this.experiment).replace("_", "-"));
-                    }
+
                     //TODO hard coded
                     if (rawFileName.contains(".fastq"))
                         rawGeo.setFileType("fastq");

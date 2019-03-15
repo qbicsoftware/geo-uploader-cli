@@ -42,12 +42,14 @@ public class MainTool extends QBiCTool<MainCommand> {
     private GEOOpenBisParser geoParser;
     private Config config;
 
-    public Boolean checkIfFileInFolder(String path, String identifier) {
+    private Boolean checkIfFileInFolder(String path, String identifier) {
         File folder = new File(path);
         File[] listOfFiles = folder.listFiles();
 
-        for (int j = 0; j < listOfFiles.length; j++) {
-            if (listOfFiles[j].getName().contains(identifier)) {
+
+        assert listOfFiles != null;
+        for (File listOfFile : listOfFiles) {
+            if (listOfFile.getName().contains(identifier)) {
                 System.out.println("File found for identifier " + identifier + " checking next identifier.");
                 return true;
             }
@@ -205,7 +207,7 @@ public class MainTool extends QBiCTool<MainCommand> {
 
         //If a openBis parsing config is given then the keywords in it will be used for parsing the openBis data
 
-        geoParser = new GEOOpenBisParser(command.project,command.userName,sessionToken,app,dss);
+        geoParser = new GEOOpenBisParser(command.project,command.userName,sessionToken,app,dss, config);
 
 
 
@@ -220,7 +222,8 @@ public class MainTool extends QBiCTool<MainCommand> {
 
         // Create excel from template
         try {
-            GEOExcelCreater xls = new GEOExcelCreater(geo.get("sample"), geo.get("raw"), command.output,
+            GEOExcelCreater xls;
+            xls = new GEOExcelCreater(geo.get("sample"), geo.get("raw"), command.output,
                     command.project);
             System.out.println("Creating Excel file finished successfully.");
         } catch (IOException e) {
@@ -235,7 +238,7 @@ public class MainTool extends QBiCTool<MainCommand> {
     }
 
 
-    public Config parseConfig(String configpath) {
+    private Config parseConfig(String configpath) {
         Config config = new Config();
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
