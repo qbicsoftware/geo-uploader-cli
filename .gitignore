@@ -34,3 +34,4 @@ src/main/webapp/VAADIN/widgetsets
 samples/
 
 classes/
+config.yaml
