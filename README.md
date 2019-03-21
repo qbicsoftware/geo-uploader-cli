@@ -6,7 +6,7 @@ GEO Upload command-line Tool, version 1.1.0 - Command-line utility to upload dat
 ## Author
 Created by Julian Späth (julian.spaeth@student.uni-tuebingen.de).
 
-Further development by [Timo Lucas] (https://github.com/lucass122) (timo-niklas.lucas@student.uni-tuebingen.de)
+Further development by Timo Lucas (https://github.com/lucass122) (timo-niklas.lucas@student.uni-tuebingen.de)
 
 ## Description
 
