@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/qbicsoftware/geo-uploader-cli.svg?branch=development)](https://travis-ci.com/qbicsoftware/geo-uploader-cli)[![Code Coverage]( https://codecov.io/gh/qbicsoftware/geo-uploader-cli/branch/development/graph/badge.svg)](https://codecov.io/gh/qbicsoftware/geo-uploader-cli)
 
-GEO Upload command-line Tool, version 1.1.0 - Command-line utility to upload data to GEO by parsing the information from openBis.
+GEO Upload command-line Tool - Command-line utility to upload data to GEO by parsing the information from openBis.
 ## Author
 Created by Julian Späth (julian.spaeth@student.uni-tuebingen.de).
 
@@ -19,31 +19,22 @@ Download the jar release as well as the template sheet from GEO (geo-template.xl
 
 ## How to Run
 
-Use java -cp to run the program.
+Download the jar file and the config.yaml then use java -jar to run the program providing the project identifier, output path and the path to the config file.
+
 Usage:
 
 ```console
-java -cp geo-uploader-cli.jar [Main Class] -u [ZDV Login] -p [Project Identifier] -o [Output Path] -c [Path to config]
+java -jar geo-uploader-cli.jar -p [Project Identifier] -o [Output Path] -c [Path to config]
 ```
 Example usage:
 
-```console
-java -cp geo-uploader-cli.jar life.qbic.cli.main.MainEntryPoint -u [openbis id] -p [project ID] -o output/
-```
-
-Main Class: The main class of the java project. You can use life.qbic.cli.main.MainEntryPoint
-
-ZDV Login: Username for login to openBis. In my case this is the ZDV login ID.
-
-Project Identifier: Identifier of the QBiC project e.g. QMCKA
+Project Identifier: Identifier of the QBiC project
 
 Output Path: Path to were the output should be generated
 
 # Optional Parameters
 
 -md: Set this parameter to compute the md5 checksums of the raw files and write them to the excel file
-
-
 
 ## OpenBis Identifiers
 

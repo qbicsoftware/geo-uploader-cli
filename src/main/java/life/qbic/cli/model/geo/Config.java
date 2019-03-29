@@ -3,7 +3,7 @@ package life.qbic.cli.model.geo;
 
 public class Config {
 
-   private String app;
+    private String app;
     private String dss;
     private String username;
     private String password;

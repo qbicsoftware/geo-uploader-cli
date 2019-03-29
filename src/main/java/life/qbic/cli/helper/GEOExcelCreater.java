@@ -1,31 +1,34 @@
 package life.qbic.cli.helper;
 
 import life.qbic.cli.model.geo.RawDataGEO;
-import org.apache.commons.io.IOUtils;
+import life.qbic.cli.model.geo.SampleGEO;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.util.ZipSecureFile;
-import org.apache.poi.ss.usermodel.*;
-import life.qbic.cli.model.geo.SampleGEO;
-
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.MessageFormat;
+import java.util.*;
 
 public class GEOExcelCreater {
 
     public GEOExcelCreater(List<SampleGEO> samples, List<RawDataGEO> raws, String outPath,
                            String fileName) throws IOException, InvalidFormatException {
-        //InputStream in = getClass().getResourceAsStream("geo_template.xlsx");
+        XSSFWorkbook wb;
 
-        //XSSFWorkbook wb = new XSSFWorkbook(in);
-        XSSFWorkbook wb = new XSSFWorkbook("geo_template.xlsx");
+
+        try (InputStream in = ClassLoader.class.getResourceAsStream("/geo_template.xlsx");) {
+
+            wb = new XSSFWorkbook(in);
+        }
+        //XSSFWorkbook wb = new XSSFWorkbook("geo_template.xlsx");
 
         //Get first sheet from the workbook
         XSSFSheet sheet = wb.getSheetAt(0);
@@ -62,7 +65,6 @@ public class GEOExcelCreater {
             System.out.println("Your file was written successfully! Good bye :-)");
 
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -78,7 +80,7 @@ public class GEOExcelCreater {
         String charLabels = "";
         if (samples.get(0).getCharacteristics() != null)
             for (String key : samples.get(0).getCharacteristics().keySet()) {
-                charLabels = "characteristics: " + key + "\t" + charLabels;
+                charLabels = MessageFormat.format("characteristics: {0}\t{1}", key, charLabels);
             }
 
         String header = "Sample name\ttitle\tsource name\torganism\t" + charLabels

@@ -16,13 +16,14 @@ import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.DataSetFile;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.fetchoptions.DataSetFileFetchOptions;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.search.DataSetFileSearchCriteria;
+import life.qbic.cli.model.geo.Config;
 import life.qbic.cli.model.geo.RawDataGEO;
 import life.qbic.cli.model.geo.SampleGEO;
+
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import life.qbic.cli.model.geo.Config;
 
 public class GEOOpenBisParser {
 
@@ -36,18 +37,16 @@ public class GEOOpenBisParser {
     private String sourceName;
     private String sourceNameDetailed;
     private String title;
-    private String  molecule;
-    private String  characteristics;
-    private String  property;
-    private String  experiment;
-
+    private String molecule;
+    private String characteristics;
+    private String property;
+    private String experiment;
 
 
     public GEOOpenBisParser(String projectCode, String username, String sessionToken,
                             IApplicationServerApi app, IDataStoreServerApi dss, Config config)
 
-    {        System.out.println("Constructor with parsingConfig");
-
+    {
 
 
         this.projectCode = projectCode;
@@ -63,7 +62,7 @@ public class GEOOpenBisParser {
         organism = "Q_NCBI_ORGANISM";
         this.organism = config.getOrganism();
         sourceName = "Q_PRIMARY_TISSUE";
-        this.sourceName= config.getSource_name();
+        this.sourceName = config.getSource_name();
         sourceNameDetailed = "Q_TISSUE_DETAILED";
         this.sourceNameDetailed = config.getSource_name_detailed();
         this.title = config.getTitle();
@@ -76,16 +75,8 @@ public class GEOOpenBisParser {
         this.experiment = config.getExperiment();
 
 
-
     }
 
-
-    private String checkNull(String s) {
-        if (s == null)
-            return ("Not specified");
-        else
-            return (s);
-    }
     private static Map<String, String> parseProperty(String xml, String property) {
         HashMap<String, String> properties = new HashMap<>();
         ArrayList<String> lines = new ArrayList<>(Arrays.asList(xml.split("\n")));
@@ -121,6 +112,13 @@ public class GEOOpenBisParser {
 
         is.close();
         return complete.digest();
+    }
+
+    private String checkNull(String s) {
+        if (s == null)
+            return ("Not specified");
+        else
+            return (s);
     }
 
     //public HashMap<String, List> parsePaired() {
@@ -223,8 +221,8 @@ public class GEOOpenBisParser {
             //This is the original line from Julian to set the instrument model. I replaced it
             // to be N/A all the time. THE Q_SEQUENCER_DEVICE field has to be filled for the original line to work correctly
             //rawGeo.setInstrumentModel(
-                   // rawDataSample.getExperiment().getProperty("Q_SEQUENCER_DEVICE").replace("_", " ")
-                       //     .replace("IMGAG", "").trim());
+            // rawDataSample.getExperiment().getProperty("Q_SEQUENCER_DEVICE").replace("_", " ")
+            //     .replace("IMGAG", "").trim());
 
             rawGeo.setInstrumentModel("N/A");
 
@@ -253,13 +251,13 @@ public class GEOOpenBisParser {
 
                     //Check if sample has sequecing_mode if it has not then
                     // determine sequencing mode checking for R1 in raw data name
-                            if (rawFileName.contains("_R1") || rawFileName.contains("_R2"))  {
-                                rawGeo.setSingleOrPairedEnd("Paired End");
+                    if (rawFileName.contains("_R1") || rawFileName.contains("_R2")) {
+                        rawGeo.setSingleOrPairedEnd("Paired End");
 
 
-                            } else {
-                                rawGeo.setSingleOrPairedEnd("Single End");
-                            }
+                    } else {
+                        rawGeo.setSingleOrPairedEnd("Single End");
+                    }
 
 
                     //TODO hard coded
@@ -293,7 +291,7 @@ public class GEOOpenBisParser {
             for (SampleGEO geo : sampleGEOList) {
 
                 extractedSample.getProperties();
-                if(extractedSample.getProperty(this.sourceName) != null)
+                if (extractedSample.getProperty(this.sourceName) != null)
                     geo.setSourceName(extractedSample.getProperty(this.sourceName));
                 if (geo.getTitle().contains(checkNull(extractedSample.getProperty(this.title)))) {
                     geo.setSourceName(extractedSample.getProperty(this.sourceName)
@@ -316,21 +314,21 @@ public class GEOOpenBisParser {
 
         for (Sample sampleSource : sampleSources.getObjects()) {
             for (SampleGEO geo : sampleGEOList) {
-                    if (checkNull(geo.getTitle()).equals(sampleSource.getProperty(this.title))) {
-                        geo.setOrganism(sampleSource.getProperty(this.organism));
-                        //TODO hard coded
+                if (checkNull(geo.getTitle()).equals(sampleSource.getProperty(this.title))) {
+                    geo.setOrganism(sampleSource.getProperty(this.organism));
+                    //TODO hard coded
 
-                        VocabularyTermSearchCriteria vocabularyTermSearchCriteria = new VocabularyTermSearchCriteria();
-                        vocabularyTermSearchCriteria.withCode().thatEquals(geo.getOrganism());
-                        SearchResult<VocabularyTerm> vocabularyTermSearchResult = app
-                                .searchVocabularyTerms(sessionToken, vocabularyTermSearchCriteria,
-                                        new VocabularyTermFetchOptions());
-                        for (VocabularyTerm vocabularyTerm : vocabularyTermSearchResult.getObjects()) {
-                            if (vocabularyTerm.getCode().equals(geo.getOrganism())) {
-                                geo.setOrganism(vocabularyTerm.getDescription());
-                            }
+                    VocabularyTermSearchCriteria vocabularyTermSearchCriteria = new VocabularyTermSearchCriteria();
+                    vocabularyTermSearchCriteria.withCode().thatEquals(geo.getOrganism());
+                    SearchResult<VocabularyTerm> vocabularyTermSearchResult = app
+                            .searchVocabularyTerms(sessionToken, vocabularyTermSearchCriteria,
+                                    new VocabularyTermFetchOptions());
+                    for (VocabularyTerm vocabularyTerm : vocabularyTermSearchResult.getObjects()) {
+                        if (vocabularyTerm.getCode().equals(geo.getOrganism())) {
+                            geo.setOrganism(vocabularyTerm.getDescription());
                         }
                     }
+                }
             }
         }
 

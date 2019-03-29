@@ -117,12 +117,12 @@ public class SampleGEO {
                 charValues = characteristics.get(key) + "\t" + charValues;
             }
 
-            line =
-                    checkNull(sampleName) + "\t" + title.replace(" ", "") + "\t" + checkNull(sourceName) + "\t" + checkNull(organism) + "\t"
-                            + charValues + checkNull(molecule) + "\t" + checkNull(description) + "\t" + checkNull(processedDataFile) + "\t"
-                            + checkNull(rawFile);
-            line = line.replace("null", "");
-            return line.split("\t");
+        line =
+                checkNull(sampleName) + "\t" + title.replace(" ", "") + "\t" + checkNull(sourceName) + "\t" + checkNull(organism) + "\t"
+                        + charValues + checkNull(molecule) + "\t" + checkNull(description) + "\t" + checkNull(processedDataFile) + "\t"
+                        + checkNull(rawFile);
+        line = line.replace("null", "");
+        return line.split("\t");
 
 
     }
