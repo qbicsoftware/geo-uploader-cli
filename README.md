@@ -15,7 +15,7 @@ Further development by Timo Lucas (https://github.com/lucass122) (timo-niklas.lu
 
 ## How to Install
 
-Download the jar release as well as the template sheet from GEO (geo-template.xlsx) and put them in the same directory.
+A jar file including all the dependencies can be found under releases
 
 ## How to Run
 
