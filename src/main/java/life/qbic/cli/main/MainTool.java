@@ -1,25 +1,22 @@
 package life.qbic.cli.main;
 
 import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
-import ch.ethz.sis.openbis.generic.asapi.v3.dto.dataset.DataSet;
+import ch.ethz.sis.openbis.generic.asapi.v3.dto.sample.Sample;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.systemsx.cisd.common.spring.HttpInvokerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import life.qbic.QbicDataLoader;
 import life.qbic.cli.QBiCTool;
-import life.qbic.cli.connection.CredentialHandler;
 import life.qbic.cli.helper.GEOExcelCreater;
 import life.qbic.cli.helper.GEOOpenBisParser;
 import life.qbic.cli.model.geo.Config;
+import life.qbic.cli.model.geo.RawDataGEO;
+import life.qbic.cli.model.geo.SampleGEO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,14 +76,66 @@ public class MainTool extends QBiCTool<MainCommand> {
         IDataStoreServerApi dss = null;
         IApplicationServerApi app = null;
 
+            //connect to openbis
+        try {
+            // Reference the DSS
+            dss =
+                    HttpInvokerUtils.createStreamSupportingServiceStub(IDataStoreServerApi.class,
+                            config.getDss()
+                                    + IDataStoreServerApi.SERVICE_URL, 10000);
+
+            // get a reference to AS API
+            app = HttpInvokerUtils.createServiceStub(IApplicationServerApi.class,
+                    config.getApp() + IApplicationServerApi.SERVICE_URL,
+                    10000);
+            LOG.info("openBis connection established");
+        } catch (Exception e) {
+            LOG.error("Could not connect to openBis");
+            System.exit(1);
+        }
+
+
+
+
+
+
+
+//Get the password for openBis login. If not provided in the config.yaml the user can enter it in the command line
+        if (config.getPassword() == null) {
+            try {
+                java.io.Console console = System.console();
+                password = new String(console.readPassword("Password: "));
+                if (password.isEmpty()) {
+                    System.out.println("You need to provide a password");
+                    LOG.error("No password provided");
+                    System.exit(1);
+                }
+            } catch (NullPointerException e) {
+
+               // CredentialHandler ch = new CredentialHandler("credentialProperties");
+                //password = ch.getPw();
+            }
+        } else {
+            password = config.getPassword();
+        }
+
+        // login to obtain a session token
+        String sessionToken = "";
+        try {
+            sessionToken = app.login(config.getUsername(), password);
+            LOG.info("Logged in successfully to openBis");
+        } catch (Exception e) {
+            LOG.error("Could not log in to openBis. Please check your username and password");
+        }
+
+/*
         //Use postman to download sample files if -m parameter is given
 
         if (command.md5 != null) {
             System.out.println("Downloading sample files ");
 
-            QbicDataLoader loader = new QbicDataLoader("https://qbis.qbic.uni-tuebingen.de/openbis/openbis",
-                    "https://qbis.qbic.uni-tuebingen.de:444/datastore_server", config.getUsername(), password,
-                    4 * 1024, "");
+            QbicDataDownloader loader = new QbicDataDownloader(config.getApp(), config.getDss(),
+                    config.getUsername(), password, 4 * 1024, "");
             int returnCode = loader.login();
             LOG.info(String.format("OpenBis login returned with %s", returnCode));
             if (returnCode != 0) {
@@ -101,14 +150,14 @@ public class MainTool extends QBiCTool<MainCommand> {
             identifiers = new ArrayList<>();
             String l;
             try {
-                File file = new File("identifiers");
-                FileReader fileReader = new FileReader(file);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+                        this.getClass().getResourceAsStream("/" + "identifiers")));
 
                 while ((l = bufferedReader.readLine()) != null) {
                     identifiers.add(l);
                 }
-                fileReader.close();
+                bufferedReader.close();
                 System.out.println("Contents of file:");
                 System.out.println(identifiers.toString());
             } catch (IOException e) {
@@ -116,7 +165,8 @@ public class MainTool extends QBiCTool<MainCommand> {
             }
 
             for (int i = 1; i < identifiers.size(); i++) {
-                List<DataSet> foundDataSets = loader.findAllDatasetsRecursive(identifiers.get(i));
+                QbicDataFinder finder = new QbicDataFinder(app,dss, sessionToken,"a");
+                List<DataSet> foundDataSets = finder.findAllDatasetsRecursive(identifiers.get(i));
                 if (!checkIfFileInFolder("samples/", identifiers.get(i))) {
 
 
@@ -149,53 +199,7 @@ public class MainTool extends QBiCTool<MainCommand> {
         }
 
 
-// Connect to openBis
-
-        try {
-            // Reference the DSS
-            dss =
-                    HttpInvokerUtils.createStreamSupportingServiceStub(IDataStoreServerApi.class,
-                            config.getDss()
-                                    + IDataStoreServerApi.SERVICE_URL, 10000);
-
-            // get a reference to AS API
-            app = HttpInvokerUtils.createServiceStub(IApplicationServerApi.class,
-                    config.getApp() + IApplicationServerApi.SERVICE_URL,
-                    10000);
-            LOG.info("openBis connection established");
-        } catch (Exception e) {
-            LOG.error("Could not connect to openBis");
-            System.exit(1);
-        }
-
-//Get the password for openBis login. If not provided in the config.yaml the user can enter it in the command line
-        if (config.getPassword() == null) {
-            try {
-                java.io.Console console = System.console();
-                password = new String(console.readPassword("Password: "));
-                if (password.isEmpty()) {
-                    System.out.println("You need to provide a password");
-                    LOG.error("No password provided");
-                    System.exit(1);
-                }
-            } catch (NullPointerException e) {
-
-                CredentialHandler ch = new CredentialHandler("credentialProperties");
-                password = ch.getPw();
-            }
-        } else {
-            password = config.getPassword();
-        }
-
-        // login to obtain a session token
-        String sessionToken = "";
-        try {
-            sessionToken = app.login(config.getUsername(), password);
-            LOG.info("Logged in successfully to openBis");
-        } catch (Exception e) {
-            LOG.error("Could not log in to openBis. Please check your username and password");
-        }
-
+*/
         //If a openBis parsing config is given then the keywords in it will be used for parsing the openBis data
 
         geoParser = new GEOOpenBisParser(command.project, config.getUsername(), sessionToken, app, dss, config);
@@ -210,9 +214,11 @@ public class MainTool extends QBiCTool<MainCommand> {
 
         // Create excel from template
         try {
-            new File(command.output).mkdirs();
-            GEOExcelCreater xls;
-            xls = new GEOExcelCreater(geo.get("sample"), geo.get("raw"), command.output,
+            final boolean mkdirs = new File(command.output).mkdirs();
+
+            List<SampleGEO>sampleList = geo.get("sample");
+            List<RawDataGEO>rawList = geo.get("raw");
+            new GEOExcelCreater(sampleList, rawList, command.output,
                     command.project);
             System.out.println("Creating Excel file finished successfully.");
         } catch (IOException e) {
