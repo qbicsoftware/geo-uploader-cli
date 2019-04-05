@@ -1,7 +1,6 @@
 package life.qbic.cli;
 
 import life.qbic.cli.io.OutputWriter;
-import life.qbic.cli.main.MainTool;
 import life.qbic.cli.model.geo.RawDataGEO;
 import life.qbic.cli.model.geo.SampleGEO;
 import org.junit.Test;
@@ -24,7 +23,7 @@ public class OutputWriterTest {
         testRaw.setSingleOrPairedEnd("PAIRED END");
         testSample.setSourceName("TEST SOURCE NAME");
         testSample.setOrganism("TEST ORGANISM");
-        Map<String,String> testMap = new ManagedMap<>();
+        Map<String, String> testMap = new ManagedMap<>();
         testSample.setCharacteristics(testMap);
         testSample.setCode("Test code");
         testSample.setMolecule("TEST MOLECULE");
@@ -40,7 +39,6 @@ public class OutputWriterTest {
         OutputWriter.writeNumberOfSamples(sampleList);
         OutputWriter.writeRawDataToConsole(rawList);
         OutputWriter.writeSamplesToConsole(sampleList);
-
 
 
     }

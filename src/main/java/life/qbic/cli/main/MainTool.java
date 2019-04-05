@@ -1,7 +1,6 @@
 package life.qbic.cli.main;
 
 import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
-import ch.ethz.sis.openbis.generic.asapi.v3.dto.sample.Sample;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.systemsx.cisd.common.spring.HttpInvokerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +76,7 @@ public class MainTool extends QBiCTool<MainCommand> {
         IDataStoreServerApi dss = null;
         IApplicationServerApi app = null;
 
-            //connect to openbis
+        //connect to openbis
         try {
             // Reference the DSS
             dss =
@@ -95,11 +95,6 @@ public class MainTool extends QBiCTool<MainCommand> {
         }
 
 
-
-
-
-
-
 //Get the password for openBis login. If not provided in the config.yaml the user can enter it in the command line
         if (config.getPassword() == null) {
             try {
@@ -112,7 +107,7 @@ public class MainTool extends QBiCTool<MainCommand> {
                 }
             } catch (NullPointerException e) {
 
-               // CredentialHandler ch = new CredentialHandler("credentialProperties");
+                // CredentialHandler ch = new CredentialHandler("credentialProperties");
                 //password = ch.getPw();
             }
         } else {
@@ -216,8 +211,8 @@ public class MainTool extends QBiCTool<MainCommand> {
         try {
             final boolean mkdirs = new File(command.output).mkdirs();
 
-            List<SampleGEO>sampleList = geo.get("sample");
-            List<RawDataGEO>rawList = geo.get("raw");
+            List<SampleGEO> sampleList = geo.get("sample");
+            List<RawDataGEO> rawList = geo.get("raw");
             new GEOExcelCreater(sampleList, rawList, command.output,
                     command.project);
             System.out.println("Creating Excel file finished successfully.");
