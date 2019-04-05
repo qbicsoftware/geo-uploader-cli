@@ -1,13 +1,13 @@
 <!-- no need for application log during tests -->
 <Configuration status="INFO">
-  <Appenders>
-    <Console name="SysOut" target="SYSTEM_OUT">
-      <PatternLayout pattern="%msg%n"/>
-    </Console>
-  </Appenders>
-  <Loggers>
-    <Root level="ALL">
-      <AppenderRef level="INFO" ref="SysOut"/>
-    </Root>
-  </Loggers>
+    <Appenders>
+        <Console name="SysOut" target="SYSTEM_OUT">
+            <PatternLayout pattern="%msg%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="ALL">
+            <AppenderRef level="INFO" ref="SysOut"/>
+        </Root>
+    </Loggers>
 </Configuration>
