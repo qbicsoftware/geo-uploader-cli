@@ -18,7 +18,7 @@ public class MainTest {
         args[2] = "-c=/home/tlucas/IdeaProjects/geo-uploader-cli-new/config.yaml";
 
         final ToolExecutor executor = new ToolExecutor();
-        executor.invoke(MainTool.class, MainCommand.class, args);
+        //executor.invoke(MainTool.class, MainCommand.class, args);
 
 
     }
@@ -32,7 +32,7 @@ public class MainTest {
         args[2] = "-c=/home/tlucas/IdeaProjects/geo-uploader-cli-new/config.yaml";
 
         final ToolExecutor executor = new ToolExecutor();
-        executor.invoke(MainTool.class, MainCommand.class, args);
+        //executor.invoke(MainTool.class, MainCommand.class, args);
 
 
     }
@@ -46,6 +46,6 @@ public class MainTest {
         args[3] = "-m=true";
 
         final ToolExecutor executor = new ToolExecutor();
-        executor.invoke(MainTool.class, MainCommand.class, args);
+        //executor.invoke(MainTool.class, MainCommand.class, args);
     }
 }
