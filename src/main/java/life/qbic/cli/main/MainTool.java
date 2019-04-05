@@ -219,9 +219,6 @@ public class MainTool extends QBiCTool<MainCommand> {
         } catch (IOException e) {
             LOG.error("Could not create excel file.");
             e.printStackTrace();
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-
         }
 
 
