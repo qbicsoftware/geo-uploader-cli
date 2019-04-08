@@ -16,13 +16,15 @@ import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.DataSetFile;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.fetchoptions.DataSetFileFetchOptions;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.search.DataSetFileSearchCriteria;
+import life.qbic.cli.main.MainCommand;
 import life.qbic.cli.model.geo.Config;
 import life.qbic.cli.model.geo.RawDataGEO;
 import life.qbic.cli.model.geo.SampleGEO;
 
-import java.io.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 public class GEOOpenBisParser {
@@ -41,10 +43,11 @@ public class GEOOpenBisParser {
     private String characteristics;
     private String property;
     private String experiment;
-
+    private String outPath;
+    private MainCommand command;
 
     public GEOOpenBisParser(String projectCode, String username, String sessionToken,
-                            IApplicationServerApi app, IDataStoreServerApi dss, Config config)
+                            IApplicationServerApi app, IDataStoreServerApi dss, Config config, MainCommand command)
 
     {
 
@@ -55,6 +58,9 @@ public class GEOOpenBisParser {
         this.app = app;
         this.dss = dss;
         this.config = config;
+        this.command = command;
+        outPath = command.getOutput();
+
 
         checkSpaceAvailability();
 
@@ -93,26 +99,6 @@ public class GEOOpenBisParser {
         return properties;
     }
 
-    public static byte[] getBytesOfMd5(InputStream is) throws IOException {
-        byte[] buffer = new byte[1024];
-        MessageDigest complete;
-        try {
-            complete = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        }
-
-        int numRead;
-        do {
-            numRead = is.read(buffer);
-            if (numRead > 0) {
-                complete.update(buffer, 0, numRead);
-            }
-        } while (numRead != -1);
-
-        is.close();
-        return complete.digest();
-    }
 
     private String checkNull(String s) {
         if (s == null)
@@ -148,22 +134,22 @@ public class GEOOpenBisParser {
         }
     }
 
-    public void createSampleFile(String projectIdentifier) {
 
-
-    }
 
     public String computeMd5(String rawName) {
-
-
         String md5 = "";
-        try (FileInputStream fis = new FileInputStream(new File("samples/" + rawName))) {
+        if (command.getIdentifierPath() != null) {
+
+            try (FileInputStream fis = new FileInputStream(new File(outPath + '/' + rawName))) {
             md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(String.valueOf(fis));
         } catch (FileNotFoundException e) {
             if (rawName.contains("fastq"))
-                System.out.println("Could not create checksum for file " + rawName);
+                System.out.println("File " + rawName + " does not exist download it with -f option or put it into " + outPath +
+                        " manually");
+
         } catch (IOException e) {
             e.printStackTrace();
+            }
         }
         return md5;
     }
@@ -241,12 +227,11 @@ public class GEOOpenBisParser {
                     rawGeo.setFileName(geo.getRawFile());
 
 
-                    //computeMd5(file, rawGeo);
 
                     //Create md5 checksum
                     rawFileName = rawGeo.getFileName();
-                    //String md5 = computeMd5(rawFileName);
-                    //rawGeo.setFileChecksum(md5);
+                    String md5 = computeMd5(rawFileName);
+                    rawGeo.setFileChecksum(md5);
 
 
                     //Check if sample has sequecing_mode if it has not then

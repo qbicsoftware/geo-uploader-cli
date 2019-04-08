@@ -121,7 +121,7 @@ public class GEOExcelCreater {
                 try {
                     sheet.getRow(i + 60).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Index out of bounds exception");
+                    return;
                 }
             }
 
@@ -137,7 +137,7 @@ public class GEOExcelCreater {
                 try {
                     sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Index out of bounds exception");
+                    return;
                 }
             }
 

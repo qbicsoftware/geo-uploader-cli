@@ -37,8 +37,8 @@ public class OutputWriterTest {
 
 
         OutputWriter.writeNumberOfSamples(sampleList);
-        OutputWriter.writeRawDataToConsole(rawList);
-        OutputWriter.writeSamplesToConsole(sampleList);
+        //OutputWriter.writeRawDataToConsole(rawList);
+        //OutputWriter.writeSamplesToConsole(sampleList);
 
 
     }

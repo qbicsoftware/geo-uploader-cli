@@ -1,7 +1,5 @@
 package life.qbic.cli;
 
-import life.qbic.cli.main.MainCommand;
-import life.qbic.cli.main.MainTool;
 import org.junit.Test;
 
 /**
@@ -43,7 +41,7 @@ public class MainTest {
         args[0] = "-p=QGVIN";
         args[1] = "-o=new_folder/test";
         args[2] = "-c=/home/tlucas/IdeaProjects/geo-uploader-cli-new/config.yaml";
-        args[3] = "-m=true";
+        args[3] = "-f=/home/tlucas/IdeaProjects/geo-uploader-cli-new/src/main/resources/identifiers";
 
         final ToolExecutor executor = new ToolExecutor();
         //executor.invoke(MainTool.class, MainCommand.class, args);
