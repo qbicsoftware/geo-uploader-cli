@@ -3,7 +3,6 @@ package life.qbic.cli.helper;
 import life.qbic.cli.model.geo.RawDataGEO;
 import life.qbic.cli.model.geo.SampleGEO;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,11 +19,11 @@ import java.util.*;
 public class GEOExcelCreater {
 
     public GEOExcelCreater(List<SampleGEO> samples, List<RawDataGEO> raws, String outPath,
-                           String fileName) throws IOException, InvalidFormatException {
+                           String fileName) throws IOException {
         XSSFWorkbook wb;
 
 
-        try (InputStream in = ClassLoader.class.getResourceAsStream("/geo_template.xlsx");) {
+        try (InputStream in = ClassLoader.class.getResourceAsStream("/geo_template.xlsx")) {
 
             wb = new XSSFWorkbook(in);
         }
@@ -122,6 +121,7 @@ public class GEOExcelCreater {
                 try {
                     sheet.getRow(i + 60).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
                 } catch (ArrayIndexOutOfBoundsException e) {
+                    return;
                 }
             }
 
@@ -137,6 +137,7 @@ public class GEOExcelCreater {
                 try {
                     sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
                 } catch (ArrayIndexOutOfBoundsException e) {
+                    return;
                 }
             }
 
