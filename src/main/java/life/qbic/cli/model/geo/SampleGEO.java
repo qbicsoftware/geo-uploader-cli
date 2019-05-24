@@ -102,25 +102,26 @@ public class SampleGEO {
     public String[] getSampleRow() {
         String line;
         StringBuilder charLabels = new StringBuilder();
-        assert characteristics != null;
+        if (characteristics != null)
         for (String key : characteristics.keySet()) {
             charLabels.insert(0, "characteristics: " + key + "\t");
         }
 
-        String header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
-                + "molecule\tdescription\tprocessed data file\traw file";
+        //   String header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
+        //         + "molecule\tdescription\tprocessed data file\traw file";
 
         StringBuilder charValues = new StringBuilder();
-
-        for (String key : characteristics.keySet()) {
-            charValues.insert(0, characteristics.get(key) + "\t");
-        }
+        if (characteristics != null)
+            for (String key : characteristics.keySet()) {
+                charValues.insert(0, characteristics.get(key) + "\t");
+            }
 
         line =
-                checkNull(sampleName) + "\t" + checkNull(title.replace(" ", "")) + "\t" + checkNull(sourceName) + "\t" + checkNull(organism) + "\t"
+                checkNull(sampleName) + "\t" + checkNull(title) + "\t" + checkNull(sourceName) + "\t" + checkNull(organism) + "\t"
                         + charValues + checkNull(molecule) + "\t" + checkNull(description) + "\t" + checkNull(processedDataFile) + "\t"
                         + checkNull(rawFile);
         line = line.replace("null", "");
+
         return line.split("\t");
 
 
