@@ -2,6 +2,7 @@ package life.qbic.cli.main;
 
 import ch.ethz.sis.openbis.generic.asapi.v3.IApplicationServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
+import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.id.DataSetFilePermId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import life.qbic.cli.QBiCTool;
@@ -54,14 +55,14 @@ public class MainTool extends QBiCTool<MainCommand> {
         File[] listOfFiles = folder.listFiles();
 
         if (listOfFiles != null)
-        for (File listOfFile : listOfFiles) {
-            if (listOfFile.getName().contains(identifier)) {
-                System.out.println("File found for identifier " + identifier + " checking next identifier.");
-                return true;
+            for (File listOfFile : listOfFiles) {
+                if (listOfFile.getName().contains(identifier)) {
+                    System.out.println("File found for identifier " + identifier + " checking next identifier.");
+                    return true;
+                }
+
+
             }
-
-
-        }
         System.out.println("No file found for identifier " + identifier + " beginning download.");
         return false;
     }
@@ -110,7 +111,7 @@ public class MainTool extends QBiCTool<MainCommand> {
         String sessionToken = manager.getSessionToken();
 
 
-        //Use postman to download sample files if -m parameter is given
+        //Use postman to download sample files if -f parameter is given
         if (command.getIdentifierPath() != null) {
 
             PostmanDataFilterer filterer = new PostmanDataFilterer();
@@ -130,6 +131,10 @@ public class MainTool extends QBiCTool<MainCommand> {
             ArrayList<String> identifiers;
             identifiers = new ArrayList<>();
             String l;
+            ArrayList<String> suffixFilters = new ArrayList<>();
+            suffixFilters.add("fastq.gz");
+
+
             try {
 
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(command.getIdentifierPath()));
@@ -142,7 +147,34 @@ public class MainTool extends QBiCTool<MainCommand> {
                 e.printStackTrace();
             }
             //Check if files are already downloaded and remove identifier from list if yes
-            identifiers.removeIf(a -> checkIfFileInFolder(command.getOutput(), a));
+
+            for (int i = 0; i < identifiers.size(); i++) {
+
+                List<DataSetFilePermId> filteredPermIDs = finder.findAllSuffixFilteredPermIDs(identifiers.get(i), suffixFilters);
+                if (filteredPermIDs.size() == 0) {
+                    identifiers.remove(i);
+                    i--;
+                    continue;}
+
+                else {
+                    int numOfIDs = filteredPermIDs.size();
+                    for (int j = 0; j < numOfIDs; j++) {
+                        String[] fileNames = finder.findAllSuffixFilteredPermIDs(identifiers.get(i), suffixFilters).get(i).getFilePath().split("/");
+                        String fileName = fileNames[fileNames.length - 1];
+                        File f = new File(command.getOutput() + fileName);
+                        if (f.exists() && !f.isDirectory() && filteredPermIDs.size() != 0) {
+                            filteredPermIDs.remove(0);
+                            // do something
+                        }
+
+
+                    }
+                    if (filteredPermIDs.size() == 0 && identifiers.size() != 0) {
+                        identifiers.remove(0);
+                        i--;
+                    }
+                }
+            }
 
 
             if (identifiers.size() != 0) {
@@ -172,9 +204,6 @@ public class MainTool extends QBiCTool<MainCommand> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
 
 
         //If a openBis parsing config is given then the keywords in it will be used for parsing the openBis data

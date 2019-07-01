@@ -147,7 +147,7 @@ public class GEOOpenBisParser {
         } catch (FileNotFoundException e) {
             if (rawName.contains("fastq"))
                 System.out.println("File " + rawName + " does not exist download it with -f option or put it into " + outPath +
-                        " manually");
+                        " manually to compute its checksum!");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -230,7 +230,7 @@ public class GEOOpenBisParser {
                     rawGeo.setFileName(rawFileName);
 
 
-                    if (rawFileName == "source_dropbox.txt")
+                    if (rawFileName.contains("dropbox"))
                         continue;
                     //Create md5 checksum
 
