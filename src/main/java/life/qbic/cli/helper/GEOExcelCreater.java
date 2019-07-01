@@ -22,8 +22,8 @@ public class GEOExcelCreater {
                            String fileName) throws IOException {
         XSSFWorkbook wb;
 
-
-        try (InputStream in = ClassLoader.class.getResourceAsStream("/geo_template.xlsx")) {
+//MAKE SURE THAT TEMPLATE IS PRESENT IN SAME FOLDER AS THIS CLASS!!
+        try (InputStream in = this.getClass().getResourceAsStream("/geo_template.xlsx")) {
 
             wb = new XSSFWorkbook(in);
         }
@@ -39,14 +39,17 @@ public class GEOExcelCreater {
 
             System.out.println("Writing " + samples.size() + " Samples to Excel File ...");
         }
-        //Add raw names to paired end experiments column if project uses paired end data
+        //add paired end information and raw information for paired end experiments
         if (raws.get(0).getFileName().contains("_R1") || raws.get(0).getFileName().contains("_R2")) {
             try {
+                addRawFilesRows(sheet, raws);
                 addPairedEndFilesRow(sheet, raws);
+
             } catch (ArrayIndexOutOfBoundsException e) {
                 System.out.println("No samples found. Please check your input and try again.");
             }
         } else
+            // if the project is not paired end then only add the raw file infos
             addRawFilesRows(sheet, raws);
         try {
             adaptSampleHeader(sheet, samples);
@@ -109,9 +112,7 @@ public class GEOExcelCreater {
     private void addSampleRows(Sheet sheet, List<SampleGEO> samples) {
         sheet.shiftRows(20, sheet.getLastRowNum(), samples.size() - 3);
         for (int i = 0; i < samples.size(); i++) {
-            System.out.println(samples.get(i).getRawFile());
 
-            System.out.println("sample");
             sheet.createRow(i + 20);
             for (int j = 0; j < sheet.getRow(19).getLastCellNum() - 3; j++) {
                 sheet.getRow(i + 20).createCell(j);
