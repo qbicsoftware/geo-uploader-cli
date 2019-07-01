@@ -31,10 +31,16 @@ public class GEOExcelCreater {
 
         //Get first sheet from the workbook
         XSSFSheet sheet = wb.getSheetAt(0);
+        if (raws.get(0).getFileName().contains("_R1") || raws.get(0).getFileName().contains("_R2")) {
+            System.out.println("Writing " + samples.size() / 2 + " Samples to Excel File ...");
 
-        System.out.println("Writing " + samples.size() + " Samples to Excel File ...");
+        } else {
+
+
+            System.out.println("Writing " + samples.size() + " Samples to Excel File ...");
+        }
         //Add raw names to paired end experiments column if project uses paired end data
-        if (raws.get(0).getFileName().contains("R1") || raws.get(0).getFileName().contains("R2")) {
+        if (raws.get(0).getFileName().contains("_R1") || raws.get(0).getFileName().contains("_R2")) {
             try {
                 addPairedEndFilesRow(sheet, raws);
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -46,7 +52,7 @@ public class GEOExcelCreater {
             adaptSampleHeader(sheet, samples);
         } catch (IndexOutOfBoundsException e) {
             System.out.println("No samples found. Please check your input and try again.");
-            System.exit(1);
+
         }
 
 
@@ -54,6 +60,7 @@ public class GEOExcelCreater {
             addSampleRows(sheet, samples);
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("No samples found. Please check your input and try again.");
+            e.printStackTrace();
         }
 
 
@@ -102,8 +109,11 @@ public class GEOExcelCreater {
     private void addSampleRows(Sheet sheet, List<SampleGEO> samples) {
         sheet.shiftRows(20, sheet.getLastRowNum(), samples.size() - 3);
         for (int i = 0; i < samples.size(); i++) {
+            System.out.println(samples.get(i).getRawFile());
+
+            System.out.println("sample");
             sheet.createRow(i + 20);
-            for (int j = 0; j < sheet.getRow(19).getLastCellNum(); j++) {
+            for (int j = 0; j < sheet.getRow(19).getLastCellNum() - 3; j++) {
                 sheet.getRow(i + 20).createCell(j);
                 sheet.getRow(i + 20).getCell(j).setCellValue(samples.get(i).getSampleRow()[j]);
             }
@@ -113,20 +123,65 @@ public class GEOExcelCreater {
 
 
     private void addPairedEndFilesRow(Sheet sheet, List<RawDataGEO> raw) {
-        sheet.shiftRows(60, sheet.getLastRowNum(), raw.size() - 2);
+        //Sort list lexicographically
+        Comparator<RawDataGEO> compareByFileName = (RawDataGEO r1, RawDataGEO r2) -> r1.getFileName().compareTo(r2.getFileName());
+        Collections.sort(raw, compareByFileName);
+
+        Map<Object, ArrayList<Object>> rawMap = new HashMap<>();
+        ArrayList<String> identList = new ArrayList<>();
+
+
         for (int i = 0; i < raw.size(); i++) {
-            sheet.createRow(i + 60);
-            for (int j = 0; j < sheet.getRow(59).getLastCellNum() - 1; j++) {
-                sheet.getRow(i + 60).createCell(j);
-                try {
-                    sheet.getRow(i + 60).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    return;
+            String name = raw.get(i).getFileName();
+            String[] idents = name.split("_");
+            String ident = idents[0] + "_" + idents[1] + "_" + idents[2] + "_" + idents[3];
+            identList.add(ident);
+            ArrayList<Object> rawList = new ArrayList<>();
+
+
+            for (int j = 0; j < raw.size(); j++) {
+                String name2 = raw.get(j).getFileName();
+
+                if (name2.contains(ident)) {
+                    rawList.add(name2);
+                    rawMap.put(ident, rawList);
                 }
             }
 
+
         }
+
+
+
+        sheet.shiftRows(60, sheet.getLastRowNum(), raw.size() - 2);
+        int sampleNum;
+        if (raw.get(0).getFileName().contains("_R1"))
+            sampleNum = identList.size() / 2;
+        else
+            sampleNum = identList.size();
+        for (int i = 0; i < sampleNum; i++) {
+            sheet.createRow(i + 60);
+            try {
+
+
+                sheet.getRow(i + 59).createCell(0);
+                sheet.getRow(i + 59).getCell(0).setCellValue((String) rawMap.get(identList.get(i)).get(0));
+                sheet.getRow(i + 59).createCell(1);
+                sheet.getRow(i + 59).getCell(1).setCellValue((String) rawMap.get(identList.get(i)).get(1));
+
+
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("Index error. One sample may have no or only one raw file");
+
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("Index error. One sample may have no or only one raw file");
+            }
+
+        }
+
+
     }
+
 
     private void addRawFilesRows(Sheet sheet, List<RawDataGEO> raw) {
         sheet.shiftRows(53, sheet.getLastRowNum(), raw.size() - 2);
@@ -137,7 +192,6 @@ public class GEOExcelCreater {
                 try {
                     sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    return;
                 }
             }
 
