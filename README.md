@@ -28,13 +28,19 @@ java -jar geo-uploader-cli.jar -p [Project Identifier] -o [Output Path] -c [Path
 ```
 Example usage:
 
-Project Identifier: Identifier of the QBiC project
+# Mandatory Parameters:
+
+Project Identifier: Identifier of the project
 
 Output Path: Path to were the output should be generated
 
+Path to config: A path to a config file. This file needs to be created manually based on the information given in this readme. See section Config File for more information. Future releases will include an example 'config.yaml' that needs to be adapted by the user himself.
+
+
 # Optional Parameters
 
--md: Set this parameter to compute the md5 checksums of the raw files and write them to the excel file
+-f: Required to calculate MD5 checksums. Path to a text file containing identifiers for the samples. If this is set the geo-uploader will download the sample files and calculate the checksums for them.
+
 
 ## OpenBis Identifiers
 
@@ -56,7 +62,12 @@ The following fields need to be filled out for each sample:
 
 ## Config File
 
--c [Path to config.yaml]: Provide a config file that includes login information as well as the openBis identifiers that are parsed to the excel file. All the fields except for the password have to be filled out in order for the program to run
+IMPORTANT:
+
+The complete config file is not included with the software!
+In order for the geo-uploader-cli to work you have to manually create a 'config.yaml' based on the given information! Future releases will include an example 'config.yaml' that can be adapted by the user.
+
+-c [Path to config.yaml]: Provide a config file that includes login information as well as the openBis identifiers that are parsed to the excel file. All the fields except for the password have to be filled out in order for the program to run. If the password field is left empty you will be asked to insert it when running the geo-uploader-cli.
 
 Example Config file:
 
