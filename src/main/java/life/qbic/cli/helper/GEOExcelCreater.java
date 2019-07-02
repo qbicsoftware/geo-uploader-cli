@@ -33,7 +33,7 @@ public class GEOExcelCreater {
 
         Boolean pairedEnd = checkSingleOrPaired(raws);
         XSSFSheet sheet = wb.getSheetAt(0);
-        if(pairedEnd) {
+        if (pairedEnd) {
             System.out.println("Writing " + samples.size() / 2 + " Samples to Excel File ...");
 
         } else {
@@ -43,20 +43,20 @@ public class GEOExcelCreater {
         }
         //add paired end information and raw information for paired end experiments
         //method returns true if project contains paired ened data
-       if(pairedEnd) {
+        if (pairedEnd) {
             try {
-                if(pairedEnd)
-                    System.out.println("Found paired end data");
-                addPairedEndFilesRow(sheet, raws,pairedEnd);
+                System.out.println("Found paired end data");
+                addPairedEndFilesRow(sheet, raws, pairedEnd);
                 addRawFilesRows(sheet, raws);
 
 
             } catch (ArrayIndexOutOfBoundsException e) {
                 System.out.println("No samples found. Please check your input and try again.");
-            } }
-         else {
+            }
+        } else {
             // if the project is not paired end then only add the raw file infos
-            addRawFilesRows(sheet, raws);}
+            addRawFilesRows(sheet, raws);
+        }
         try {
             adaptSampleHeader(sheet, samples);
         } catch (IndexOutOfBoundsException e) {
@@ -129,7 +129,8 @@ public class GEOExcelCreater {
     }
 
 
-    private void addPairedEndFilesRow(Sheet sheet, List<RawDataGEO> raw,Boolean pairedEnd) {
+    private void addPairedEndFilesRow(Sheet sheet, List<RawDataGEO> raw, Boolean pairedEnd) {
+
         //Sort list lexicographically
         Comparator<RawDataGEO> compareByFileName = (RawDataGEO r1, RawDataGEO r2) -> r1.getFileName().compareTo(r2.getFileName());
         Collections.sort(raw, compareByFileName);
@@ -141,8 +142,9 @@ public class GEOExcelCreater {
         for (int i = 0; i < raw.size(); i++) {
             String name = raw.get(i).getFileName();
             String[] idents = name.split("_");
-            try{
-            String ident = idents[0] + "_" + idents[1] + "_" + idents[2] + "_" + idents[3];
+            try {
+                String ident = idents[0] + "_" + idents[1] + "_" + idents[2] + "_" + idents[3];
+
                 identList.add(ident);
                 ArrayList<Object> rawList = new ArrayList<>();
 
@@ -157,14 +159,12 @@ public class GEOExcelCreater {
                 }
 
 
-            }
-            catch (ArrayIndexOutOfBoundsException e) {
+            } catch (ArrayIndexOutOfBoundsException e) {
                 continue;
             }
 
 
         }
-
 
 
         sheet.shiftRows(60, sheet.getLastRowNum(), raw.size() - 2);
@@ -196,7 +196,8 @@ public class GEOExcelCreater {
 
     }
 
-//Method returns true if project contains paired end data
+    //Method returns true if project contains paired end data
+
     private void addRawFilesRows(Sheet sheet, List<RawDataGEO> raw) {
         sheet.shiftRows(53, sheet.getLastRowNum(), raw.size() - 2);
         for (int i = 0; i < raw.size(); i++) {
@@ -216,11 +217,12 @@ public class GEOExcelCreater {
         Boolean R1 = false;
         Boolean R2 = false;
         for (int i = 0; i < raws.size(); i++) {
-            if(raws.get(i).getFileName().contains("_R1"))
+            if (raws.get(i).getFileName().contains("_R1"))
                 R1 = true;
-            if(raws.get(i).getFileName().contains("_R2"))
+            if (raws.get(i).getFileName().contains("_R2"))
                 R2 = true;
-            if(R1 && R2)
+            if (R1 && R2)
+
                 break;
 
         }

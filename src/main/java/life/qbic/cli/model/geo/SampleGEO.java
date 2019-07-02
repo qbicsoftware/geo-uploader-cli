@@ -103,9 +103,9 @@ public class SampleGEO {
         String line;
         StringBuilder charLabels = new StringBuilder();
         if (characteristics != null)
-        for (String key : characteristics.keySet()) {
-            charLabels.insert(0, "characteristics: " + key + "\t");
-        }
+            for (String key : characteristics.keySet()) {
+                charLabels.insert(0, "characteristics: " + key + "\t");
+            }
 
         //   String header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
         //         + "molecule\tdescription\tprocessed data file\traw file";

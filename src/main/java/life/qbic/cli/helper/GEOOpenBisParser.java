@@ -71,7 +71,8 @@ public class GEOOpenBisParser {
         this.organism = config.getOrganism();
         sourceName = "Q_PRIMARY_TISSUE";
         this.sourceName = config.getSource_name();
-        sourceNameDetailed = "Q_TISSUE_DETAILED";
+        sourceNameDetailed = "Q_TISSUE_DETAILED";          xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+
         this.sourceNameDetailed = config.getSource_name_detailed();
         this.title = config.getTitle();
         molecule = "Q_SAMPLE_TYPE";
@@ -151,7 +152,7 @@ public class GEOOpenBisParser {
 
         } catch (IOException e) {
             e.printStackTrace();
-            }
+        }
 
         return md5;
     }

@@ -74,8 +74,6 @@ public class MainTool extends QBiCTool<MainCommand> {
         final MainCommand command = super.getCommand();
         LOG.info("Parse commands");
 
-        String password;
-
 
         config = parseConfig(command.getConfigPath());
 
@@ -87,23 +85,32 @@ public class MainTool extends QBiCTool<MainCommand> {
         if (config.getPassword() == null) {
             try {
                 java.io.Console console = System.console();
-                password = new String(console.readPassword("Password: "));
-                if (password.isEmpty()) {
+                char[] pw = console.readPassword("Password: ");
+                String password = new String(pw);
+                config.setPassword(password);
+                if (config.getPassword().isEmpty()) {
                     System.out.println("You need to provide a password");
                     LOG.error("No password provided");
-                    System.exit(1);
                 }
             } catch (NullPointerException e) {
+                LOG.info("Could not open console. Are you using an IDE to run the program? Try providing the password in the config file!");
                 e.printStackTrace();
 
 
             }
         }
+
+        config = parseConfig(command.getConfigPath());
+
+        IDataStoreServerApi dss;
+        IApplicationServerApi app;
+
+
         PostmanSessionManager manager;
         try {
             manager = loginToOpenBis();
         } catch (PostmanOpenBISLoginFailedException e) {
-            System.out.println("Could not connect to openBis. Check your config file");
+            System.out.println("Could not connect to openBis. Check your config file or provide the right password.");
             return;
         }
         app = manager.getApplicationServer();
