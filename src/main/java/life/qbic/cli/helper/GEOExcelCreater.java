@@ -180,9 +180,7 @@ public class GEOExcelCreater {
 
 
 //remove duplicates if any
-        //Set setItems = new LinkedHashSet(identList);
-        //identList.clear();
-        //identList.addAll(setItems);
+
 
         for (int i = 0; i < raw.size(); i++) {
             if (rawMap.get(identList.get(i)).size() > 1) {
@@ -193,7 +191,9 @@ public class GEOExcelCreater {
 
         }
 
-
+        Set setItems = new LinkedHashSet(raw);
+        raw.clear();
+        raw.addAll(setItems);
         sheet.shiftRows(53, sheet.getLastRowNum(), raw.size() - 2);
         for (int i = 0; i < raw.size(); i++) {
             sheet.createRow(i + 53);
@@ -250,7 +250,7 @@ public class GEOExcelCreater {
                 for (int j = 0; j < raw.size(); j++) {
                     String name2 = raw.get(j).getFileName();
 
-                    if (name2.contains(ident)) {
+                    if (name2.contains(ident) && name2 != name) {
                         rawList.add(name2);
                         rawMap.put(ident, rawList);
                     }
