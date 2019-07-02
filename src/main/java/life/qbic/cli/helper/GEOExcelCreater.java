@@ -142,6 +142,7 @@ public class GEOExcelCreater {
         ArrayList<String> identList = (ArrayList<String>) rawMapList.get(1);
 
 
+
         sheet.shiftRows(60, sheet.getLastRowNum(), raw.size() - 2);
         int sampleNum;
         if (pairedEnd)
@@ -172,6 +173,7 @@ public class GEOExcelCreater {
     }
 
     //Method returns true if project contains paired end data
+
     private void addRawFilesRows(Sheet sheet, List<RawDataGEO> raw) {
 
         List rawMapList = computeRawMapIdentList(raw);
@@ -218,6 +220,7 @@ public class GEOExcelCreater {
             if (raws.get(i).getFileName().contains("_R2"))
                 R2 = true;
             if (R1 && R2)
+
                 break;
 
         }
