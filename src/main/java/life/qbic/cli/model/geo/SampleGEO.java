@@ -92,7 +92,7 @@ public class SampleGEO {
         this.code = code;
     }
 
-    public String checkNull(String s) {
+    private String checkNull(String s) {
         if (s == null)
             return ("Not specified");
         else
@@ -100,28 +100,28 @@ public class SampleGEO {
     }
 
     public String[] getSampleRow() {
-        String line = "";
-        String charLabels = "";
+        String line;
+        StringBuilder charLabels = new StringBuilder();
         if (characteristics != null)
             for (String key : characteristics.keySet()) {
-                charLabels = "characteristics: " + key + "\t" + charLabels;
+                charLabels.insert(0, "characteristics: " + key + "\t");
             }
 
-        String header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
-                + "molecule\tdescription\tprocessed data file\traw file";
+        //   String header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
+        //         + "molecule\tdescription\tprocessed data file\traw file";
 
-        String charValues = "";
-
+        StringBuilder charValues = new StringBuilder();
         if (characteristics != null)
             for (String key : characteristics.keySet()) {
-                charValues = characteristics.get(key) + "\t" + charValues;
+                charValues.insert(0, characteristics.get(key) + "\t");
             }
 
         line =
-                checkNull(sampleName) + "\t" + title.replace(" ", "") + "\t" + checkNull(sourceName) + "\t" + checkNull(organism) + "\t"
+                checkNull(sampleName) + "\t" + checkNull(title) + "\t" + checkNull(sourceName) + "\t" + checkNull(organism) + "\t"
                         + charValues + checkNull(molecule) + "\t" + checkNull(description) + "\t" + checkNull(processedDataFile) + "\t"
                         + checkNull(rawFile);
         line = line.replace("null", "");
+
         return line.split("\t");
 
 

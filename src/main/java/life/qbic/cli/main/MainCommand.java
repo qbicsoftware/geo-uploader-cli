@@ -26,22 +26,35 @@ public class MainCommand extends AbstractCommand {
     //            See: https://docs.oracle.com/javase/tutorial/java/javaOO/constructors.html
 
     @Option(names = {"-p", "--project"}, required = true, description = "The project name.")
-    public String project;
+    private String project;
     @Option(names = {"-o", "--out"}, required = true, description = "The directory where the output files are created. New folders" +
             "are created automatically.")
-    public String output;
+    private String output;
     @Option(names = {"-c", "--config"}, required = true, description = "Path to a file containing an openBis parsing config." +
             "See the documentation for more info: https://github.com/qbicsoftware/geo-uploader-cli")
-    public String configPath;
-    @Option(names = {"-m", "--md5checksum"}, description = "Download sample files and calculate md5 checksum.")
-    public Boolean md5;
+    private String configPath;
     @Option(names = {"-f", "--file"}, description = "Path to a file containing the sample identifiers for downloading the samples." +
             "Provide this when you want to download the raw data for md5 checksum calculation.")
-    public String identifierPath;
+    private String identifierPath;
 
 
     public MainCommand() {
 
     }
 
+    public String getIdentifierPath() {
+        return identifierPath;
+    }
+
+    public String getConfigPath() {
+        return configPath;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    public String getProject() {
+        return project;
+    }
 }

@@ -16,13 +16,15 @@ import ch.ethz.sis.openbis.generic.dssapi.v3.IDataStoreServerApi;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.DataSetFile;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.fetchoptions.DataSetFileFetchOptions;
 import ch.ethz.sis.openbis.generic.dssapi.v3.dto.datasetfile.search.DataSetFileSearchCriteria;
+import life.qbic.cli.main.MainCommand;
 import life.qbic.cli.model.geo.Config;
 import life.qbic.cli.model.geo.RawDataGEO;
 import life.qbic.cli.model.geo.SampleGEO;
 
-import java.io.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 public class GEOOpenBisParser {
@@ -41,10 +43,13 @@ public class GEOOpenBisParser {
     private String characteristics;
     private String property;
     private String experiment;
+    private String outPath;
+    private MainCommand command;
+    private String md5 = "";
 
 
     public GEOOpenBisParser(String projectCode, String username, String sessionToken,
-                            IApplicationServerApi app, IDataStoreServerApi dss, Config config)
+                            IApplicationServerApi app, IDataStoreServerApi dss, Config config, MainCommand command)
 
     {
 
@@ -55,6 +60,9 @@ public class GEOOpenBisParser {
         this.app = app;
         this.dss = dss;
         this.config = config;
+        this.command = command;
+        outPath = command.getOutput();
+
 
         checkSpaceAvailability();
 
@@ -93,26 +101,6 @@ public class GEOOpenBisParser {
         return properties;
     }
 
-    public static byte[] getBytesOfMd5(InputStream is) throws IOException {
-        byte[] buffer = new byte[1024];
-        MessageDigest complete;
-        try {
-            complete = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        }
-
-        int numRead;
-        do {
-            numRead = is.read(buffer);
-            if (numRead > 0) {
-                complete.update(buffer, 0, numRead);
-            }
-        } while (numRead != -1);
-
-        is.close();
-        return complete.digest();
-    }
 
     private String checkNull(String s) {
         if (s == null)
@@ -148,23 +136,23 @@ public class GEOOpenBisParser {
         }
     }
 
-    public void createSampleFile(String projectIdentifier) {
 
-
-    }
 
     public String computeMd5(String rawName) {
-
-
         String md5 = "";
-        try (FileInputStream fis = new FileInputStream(new File("samples/" + rawName))) {
+
+
+        try (FileInputStream fis = new FileInputStream(new File(outPath + '/' + rawName))) {
             md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(String.valueOf(fis));
         } catch (FileNotFoundException e) {
             if (rawName.contains("fastq"))
-                System.out.println("Could not create checksum for file " + rawName);
+                System.out.println("File " + rawName + " does not exist download it with -f option or put it into " + outPath +
+                        " manually to compute its checksum!");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return md5;
     }
 
@@ -213,18 +201,12 @@ public class GEOOpenBisParser {
         List<RawDataGEO> rawDataGEOList = new ArrayList<>();
         for (int i = 0; i < rawData.getObjects().size(); i++) {
             Sample rawDataSample = rawData.getObjects().get(i);
-            SampleGEO geo = new SampleGEO();
-            RawDataGEO rawGeo = new RawDataGEO();
-            geo.setSampleName("Sample " + (i + 1));
-            geo.setCode("Code: " + rawDataSample.getCode());
 
             //This is the original line from Julian to set the instrument model. I replaced it
             // to be N/A all the time. THE Q_SEQUENCER_DEVICE field has to be filled for the original line to work correctly
             //rawGeo.setInstrumentModel(
             // rawDataSample.getExperiment().getProperty("Q_SEQUENCER_DEVICE").replace("_", " ")
             //     .replace("IMGAG", "").trim());
-
-            rawGeo.setInstrumentModel("N/A");
 
 
             DataSetFileSearchCriteria criteria = new DataSetFileSearchCriteria();
@@ -235,18 +217,27 @@ public class GEOOpenBisParser {
                 if (file.getPermId().toString().contains(".fastq")
                         && !file.getPermId().toString().contains(".sha256sum")
                         && !file.getPermId().toString().contains("origlabfilename")) {
+                    SampleGEO geo = new SampleGEO();
+                    geo.setSampleName("Sample " + (i + 1));
+                    geo.setCode("Code: " + rawDataSample.getCode());
+
                     String[] path = file.getPermId().toString().split("/");
+                    RawDataGEO rawGeo = new RawDataGEO();
 
-                    geo.setRawFile(path[path.length - 1]);
-                    rawGeo.setFileName(geo.getRawFile());
+                    rawGeo.setInstrumentModel("N/A");
+                    rawFileName = path[path.length - 1];
+
+                    rawGeo.setFileName(rawFileName);
 
 
-                    //computeMd5(file, rawGeo);
-
+                    if (rawFileName.contains("dropbox"))
+                        continue;
                     //Create md5 checksum
-                    rawFileName = rawGeo.getFileName();
-                    //String md5 = computeMd5(rawFileName);
-                    //rawGeo.setFileChecksum(md5);
+
+                    if (command.getIdentifierPath() != null) {
+                        md5 = computeMd5(rawFileName);
+                        rawGeo.setFileChecksum(md5);
+                    }
 
 
                     //Check if sample has sequecing_mode if it has not then
@@ -263,9 +254,11 @@ public class GEOOpenBisParser {
                     //TODO hard coded
                     if (rawFileName.contains(".fastq"))
                         rawGeo.setFileType("fastq");
+                    geo.setRawFile(rawFileName);
+
+                    sampleGEOList.add(geo);
+                    rawDataGEOList.add(rawGeo);
                 }
-            sampleGEOList.add(geo);
-            rawDataGEOList.add(rawGeo);
         }
 
         for (Sample measuredSample : measuredSamples.getObjects()) {
@@ -293,21 +286,22 @@ public class GEOOpenBisParser {
                 extractedSample.getProperties();
                 if (extractedSample.getProperty(this.sourceName) != null)
                     geo.setSourceName(extractedSample.getProperty(this.sourceName));
-                if (geo.getTitle().contains(checkNull(extractedSample.getProperty(this.title)))) {
-                    geo.setSourceName(extractedSample.getProperty(this.sourceName)
-                            + "_" + extractedSample.getProperty(this.sourceNameDetailed));
-                    VocabularyTermSearchCriteria vocabularyTermSearchCriteria = new VocabularyTermSearchCriteria();
-                    vocabularyTermSearchCriteria.withCode()
-                            .thatEquals(extractedSample.getProperty(this.sourceNameDetailed));
-                    SearchResult<VocabularyTerm> vocabularyTermSearchResult = app
-                            .searchVocabularyTerms(sessionToken, vocabularyTermSearchCriteria,
-                                    new VocabularyTermFetchOptions());
-                    for (VocabularyTerm vocabularyTerm : vocabularyTermSearchResult.getObjects()) {
-                        if (vocabularyTerm.getCode().equals(extractedSample.getProperty(this.sourceNameDetailed))) {
-                            geo.setSourceName(vocabularyTerm.getDescription());
+                if (geo.getTitle() != null)
+                    if (geo.getTitle().contains(checkNull(extractedSample.getProperty(this.title)))) {
+                        geo.setSourceName(extractedSample.getProperty(this.sourceName)
+                                + "_" + extractedSample.getProperty(this.sourceNameDetailed));
+                        VocabularyTermSearchCriteria vocabularyTermSearchCriteria = new VocabularyTermSearchCriteria();
+                        vocabularyTermSearchCriteria.withCode()
+                                .thatEquals(extractedSample.getProperty(this.sourceNameDetailed));
+                        SearchResult<VocabularyTerm> vocabularyTermSearchResult = app
+                                .searchVocabularyTerms(sessionToken, vocabularyTermSearchCriteria,
+                                        new VocabularyTermFetchOptions());
+                        for (VocabularyTerm vocabularyTerm : vocabularyTermSearchResult.getObjects()) {
+                            if (vocabularyTerm.getCode().equals(extractedSample.getProperty(this.sourceNameDetailed))) {
+                                geo.setSourceName(vocabularyTerm.getDescription());
+                            }
                         }
                     }
-                }
             }
         }
 
