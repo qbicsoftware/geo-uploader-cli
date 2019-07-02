@@ -100,6 +100,12 @@ public class MainTool extends QBiCTool<MainCommand> {
             }
         }
 
+        config = parseConfig(command.getConfigPath());
+
+        IDataStoreServerApi dss;
+        IApplicationServerApi app;
+
+
         PostmanSessionManager manager;
         try {
             manager = loginToOpenBis();
@@ -155,8 +161,9 @@ public class MainTool extends QBiCTool<MainCommand> {
                 if (filteredPermIDs.size() == 0) {
                     identifiers.remove(i);
                     i--;
-                    continue;
-                } else {
+                    continue;}
+
+                else {
                     int numOfIDs = filteredPermIDs.size();
                     for (int j = 0; j < numOfIDs; j++) {
                         String[] fileNames = finder.findAllSuffixFilteredPermIDs(identifiers.get(i), suffixFilters).get(i).getFilePath().split("/");
