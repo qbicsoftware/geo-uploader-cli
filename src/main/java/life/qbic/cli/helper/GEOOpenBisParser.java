@@ -204,7 +204,7 @@ public class GEOOpenBisParser {
             Sample rawDataSample = rawData.getObjects().get(i);
 
             //This is the original line from Julian to set the instrument model. I replaced it
-            // to be N/A all the time. THE Q_SEQUENCER_DEVICE field has to be filled for the original line to work correctly
+            // to be N/A all the time. THE Q_SEQUENCER_DEVICE field has to be filled for the original line to work correctly -Timo
             //rawGeo.setInstrumentModel(
             // rawDataSample.getExperiment().getProperty("Q_SEQUENCER_DEVICE").replace("_", " ")
             //     .replace("IMGAG", "").trim());
@@ -243,13 +243,14 @@ public class GEOOpenBisParser {
 
                     //Check if sample has sequecing_mode if it has not then
                     // determine sequencing mode checking for R1 in raw data name
-                    if (rawFileName.contains("_R1") || rawFileName.contains("_R2")) {
-                        rawGeo.setSingleOrPairedEnd("Paired End");
+                    //!!! determine sequencing mode later when creating excel file. will leave commented for now
+                    //if (rawFileName.contains("_R1") || rawFileName.contains("_R2")) {
+                    //   rawGeo.setSingleOrPairedEnd("Paired End");
 
 
-                    } else {
-                        rawGeo.setSingleOrPairedEnd("Single End");
-                    }
+                    //} else if (!rawFileName.contains("_R1") || !rawFileName.contains("_R2")) {
+                    //  rawGeo.setSingleOrPairedEnd("Single End");
+                    //}
 
 
                     //TODO hard coded
