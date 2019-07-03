@@ -77,8 +77,6 @@ public class MainTool extends QBiCTool<MainCommand> {
 
         config = parseConfig(command.getConfigPath());
 
-        IDataStoreServerApi dss;
-        IApplicationServerApi app;
 
 
 //Get the password for openBis login. If not provided in the config.yaml the user can enter it in the command line
@@ -161,7 +159,7 @@ public class MainTool extends QBiCTool<MainCommand> {
                 if (filteredPermIDs.size() == 0) {
                     identifiers.remove(i);
                     i--;
-                    continue;}
+                }
 
                 else {
                     int numOfIDs = filteredPermIDs.size();

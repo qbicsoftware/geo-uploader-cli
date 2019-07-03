@@ -71,7 +71,7 @@ public class GEOOpenBisParser {
         this.organism = config.getOrganism();
         sourceName = "Q_PRIMARY_TISSUE";
         this.sourceName = config.getSource_name();
-        sourceNameDetailed = "Q_TISSUE_DETAILED";          xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+        sourceNameDetailed = "Q_TISSUE_DETAILED";
 
         this.sourceNameDetailed = config.getSource_name_detailed();
         this.title = config.getTitle();
@@ -138,8 +138,7 @@ public class GEOOpenBisParser {
     }
 
 
-
-    public String computeMd5(String rawName) {
+    private String computeMd5(String rawName) {
         String md5 = "";
 
 

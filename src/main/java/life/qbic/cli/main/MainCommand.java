@@ -33,7 +33,7 @@ public class MainCommand extends AbstractCommand {
     @Option(names = {"-c", "--config"}, required = true, description = "Path to a file containing an openBis parsing config." +
             "See the documentation for more info: https://github.com/qbicsoftware/geo-uploader-cli")
     private String configPath;
-    @Option(names = {"-f", "--file"}, description = "Path to a file containing the sample identifiers for downloading the samples." +
+    @Option(names = {"-md5", "--md5checksum"}, description = "Path to a file containing the sample identifiers for downloading the samples." +
             "Provide this when you want to download the raw data for md5 checksum calculation.")
     private String identifierPath;
 
@@ -46,7 +46,7 @@ public class MainCommand extends AbstractCommand {
         return identifierPath;
     }
 
-    public String getConfigPath() {
+    String getConfigPath() {
         return configPath;
     }
 
@@ -54,7 +54,7 @@ public class MainCommand extends AbstractCommand {
         return output;
     }
 
-    public String getProject() {
+    String getProject() {
         return project;
     }
 }
