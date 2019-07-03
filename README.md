@@ -39,7 +39,7 @@ Path to config: A path to a config file. This file needs to be created manually 
 
 # Optional Parameters
 
--md5: Required to calculate MD5 checksums. Path to a text file (.tsv) containing identifiers for the samples. The text file needs to contain a sample source identifier in each row. If this is set the geo-uploader will download the sample files and calculate the checksums for them.
+-md5: Required to calculate MD5 checksums. Path to a text file (.tsv) containing identifiers for the samples. The text file needs to contain a sample source identifier in each row. If this is set the geo-uploader will download the sample files and calculate the checksums for them. An example file can be found under the example folder at the root of this repository.
 
 
 ## OpenBis Identifiers
