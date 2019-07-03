@@ -1,0 +1,17 @@
+#Information needed to connect ot openbis
+#First insert the openBis connection attributes like appserver datastore server adress, openbis login and password. if no password ist provided you can insert it on the command line later
+---
+app: #appserver adress
+dss: #datastoreserver adress
+username: #username
+password: #password - if left blank tool will ask for it at beginning
+
+# Then enter Information needed for parsing. These are the default identifiers that are parsed from openBis and writen to the excel sheet. Change the identifiers to access different information from openBis
+organism: Q_NCBI_ORGANISM
+source_name: Q_PRIMARY_TISSUE
+source_name_detailed: Q_TISSUE_DETAILED
+title: Q_SECONDARY_NAME
+molecule: Q_SAMPLE_TYPE
+characteristics: Q_PROPERTIES
+property: qcategorical
+experiment: Q_SEQUENCING_MODE
