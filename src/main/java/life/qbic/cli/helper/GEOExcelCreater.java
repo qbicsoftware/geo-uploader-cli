@@ -18,6 +18,8 @@ import java.util.*;
 
 public class GEOExcelCreater {
 
+    private Boolean pairedEnd;
+
     public GEOExcelCreater(List<SampleGEO> samples, List<RawDataGEO> raws, String outPath,
                            String fileName) throws IOException {
         XSSFWorkbook wb;
@@ -31,7 +33,8 @@ public class GEOExcelCreater {
 
         //Get first sheet from the workbook
 
-        Boolean pairedEnd = checkSingleOrPaired(raws);
+        pairedEnd = checkSingleOrPaired(raws);
+
         XSSFSheet sheet = wb.getSheetAt(0);
         if (pairedEnd) {
             System.out.println("Writing " + samples.size() / 2 + " Samples to Excel File ...");
@@ -98,9 +101,15 @@ public class GEOExcelCreater {
             for (String key : samples.get(0).getCharacteristics().keySet()) {
                 charLabels = MessageFormat.format("characteristics: {0}\t{1}", key, charLabels);
             }
+        String header;
+        if (!pairedEnd) {
+            header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
+                    + "molecule\tdescription\tprocessed data file\traw file";
+        } else {
+            header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
+                    + "molecule\tdescription\tprocessed data file\traw file\traw file";
+        }
 
-        String header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
-                + "molecule\tdescription\tprocessed data file\traw file";
         String[] headerArray = header.split("\t");
         ArrayUtils.reverse(headerArray);
         List<String> headerElements = new ArrayList<>(Arrays.asList(headerArray));
@@ -117,20 +126,54 @@ public class GEOExcelCreater {
     }
 
     private void addSampleRows(Sheet sheet, List<SampleGEO> samples) {
-        sheet.shiftRows(20, sheet.getLastRowNum(), samples.size() - 3);
-        for (int i = 0; i < samples.size(); i++) {
+
+
+        Map<String, SampleGEO> sampleMap = new HashMap<>();
+        for (SampleGEO sample : samples) {
+            if (!sampleMap.containsKey(sample.getRawFile())) {
+
+
+                sampleMap.put(sample.getRawFile(), sample);
+            }
+
+
+        }
+
+        List<SampleGEO> sampleList = new ArrayList(sampleMap.values());
+
+        //  for (SampleGEO sample : sampleList) {
+        //     sample.setSampleName(sample.getSampleName().split(" ")[0]+"0"+sample.getSampleName().split(" ")[1]);
+        // }
+
+
+        Comparator<SampleGEO> compareByFileName = Comparator.comparing(SampleGEO::getSampleName);
+        Collections.sort(sampleList, compareByFileName);
+
+
+        sheet.shiftRows(20, sheet.getLastRowNum(), sampleList.size() - 3);
+        int i = 0;
+        for (SampleGEO sample : sampleList) {
 
             sheet.createRow(i + 20);
+            int numCharacteristics = 0;
+            if (sampleList.get(0).getCharacteristics() != null)
+                numCharacteristics = sampleList.get(0).getCharacteristics().size();
             try {
-                for (int j = 0; j < sheet.getRow(19).getLastCellNum(); j++) {
-
+                for (int j = 0; j < sample.getSampleRow().length + numCharacteristics; j++) {
                     sheet.getRow(i + 20).createCell(j);
-                    sheet.getRow(i + 20).getCell(j).setCellValue(samples.get(i).getSampleRow()[j]);
+                    sheet.getRow(i + 20).getCell(j).setCellValue(sample.getSampleRow()[j]);
+                    //   if(j == (int)(sample.getSampleRow().length+numCharacteristics-1)){
+                    //     sheet.getRow(i + 20).createCell(j+1);
+                    //   if(i < sampleList.size())
+                    // sheet.getRow(i + 20).getCell(j+1).setCellValue(sampleList.get(i+1).getRawFile());}
+
+
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
 
             }
 
+            i++;
         }
     }
 
@@ -177,15 +220,16 @@ public class GEOExcelCreater {
     private void addRawFilesRows(Sheet sheet, List<RawDataGEO> raw) {
 
         List rawMapList = computeRawMapIdentList(raw);
-        Map<Object, ArrayList<Object>> rawMap = (Map<Object, ArrayList<Object>>) rawMapList.get(0);
+        Map<Object, ArrayList<Object>> rawNameMap = (Map<Object, ArrayList<Object>>) rawMapList.get(0);
         ArrayList<String> identList = (ArrayList<String>) rawMapList.get(1);
+        Map<Object, RawDataGEO> rawMap = (Map<Object, RawDataGEO>) rawMapList.get(2);
 
 
 //remove duplicates if any
 
 
         for (int i = 0; i < raw.size(); i++) {
-            if (rawMap.get(identList.get(i)).size() > 1) {
+            if (rawNameMap.get(identList.get(i)).size() > 1) {
                 raw.get(i).setSingleOrPairedEnd("Paired End");
             } else {
                 raw.get(i).setSingleOrPairedEnd("Single End");
@@ -197,19 +241,33 @@ public class GEOExcelCreater {
         raw.clear();
         raw.addAll(setItems);
         sheet.shiftRows(53, sheet.getLastRowNum(), raw.size() - 2);
-        for (int i = 0; i < raw.size(); i++) {
+
+        addRawFilesRowsSinglePaired(raw, sheet, rawMap);
+
+    }
+
+    private void addRawFilesRowsSinglePaired(List<RawDataGEO> raw, Sheet sheet, Map<Object, RawDataGEO> rawMap) {
+        //List<RawDataGEO> rawList = new ArrayList<RawDataGEO>(rawMap.values());
+        int i = 0;
+        for (RawDataGEO value : rawMap.values()) {
             sheet.createRow(i + 53);
             for (int j = 0; j < 6; j++) {
                 sheet.getRow(i + 53).createCell(j);
                 try {
-                    sheet.getRow(i + 53).getCell(j).setCellValue(raw.get(i).getRawFilesRow()[j]);
+                    sheet.getRow(i + 53).getCell(j).setCellValue(value.getRawFilesRow()[j]);
                 } catch (ArrayIndexOutOfBoundsException e) {
                     e.printStackTrace();
                 }
             }
-
+            i++;
         }
+
+
     }
+
+
+
+
 
     private Boolean checkSingleOrPaired(List<RawDataGEO> raws) {
         Boolean R1 = false;
@@ -234,10 +292,11 @@ public class GEOExcelCreater {
 
 
         //Sort list lexicographically
-        Comparator<RawDataGEO> compareByFileName = (RawDataGEO r1, RawDataGEO r2) -> r1.getFileName().compareTo(r2.getFileName());
+        Comparator<RawDataGEO> compareByFileName = Comparator.comparing(RawDataGEO::getFileName);
         Collections.sort(raw, compareByFileName);
 
-        Map<Object, ArrayList<Object>> rawMap = new HashMap<>();
+        Map<Object, ArrayList<Object>> identRawNameMap = new HashMap<>();
+        Map<Object, RawDataGEO> identRawMap = new HashMap<>();
         ArrayList<String> identList = new ArrayList<>();
 
 
@@ -247,15 +306,16 @@ public class GEOExcelCreater {
             try {
                 String ident = idents[0] + "_" + idents[1] + "_" + idents[2] + "_" + idents[3];
                 identList.add(ident);
+                identRawMap.put(ident, raw.get(i));
                 ArrayList<Object> rawList = new ArrayList<>();
 
 
                 for (int j = 0; j < raw.size(); j++) {
                     String name2 = raw.get(j).getFileName();
 
-                    if (name2.contains(ident) && name2 != name) {
+                    if (name2.contains(ident) && !rawList.contains(name2)) {
                         rawList.add(name2);
-                        rawMap.put(ident, rawList);
+                        identRawNameMap.put(ident, rawList);
                     }
                 }
 
@@ -268,8 +328,9 @@ public class GEOExcelCreater {
         }
 
         List returnList = new ArrayList();
-        returnList.add(rawMap);
+        returnList.add(identRawNameMap);
         returnList.add(identList);
+        returnList.add(identRawMap);
 
         return returnList;
     }
