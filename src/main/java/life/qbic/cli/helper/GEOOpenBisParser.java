@@ -217,7 +217,7 @@ public class GEOOpenBisParser {
                 if (file.getPermId().toString().contains(".fastq")
                         && !file.getPermId().toString().contains(".sha256sum")
                         && !file.getPermId().toString().contains("origlabfilename")) {
-                    SampleGEO geo = new SampleGEO();
+                    SampleGEO geo = new SampleGEO(false);
                     geo.setSampleName("Sample " + (i + 1));
                     geo.setCode("Code: " + rawDataSample.getCode());
 

@@ -17,7 +17,7 @@ public class OutputWriterTest {
 
         List<SampleGEO> sampleList = new ArrayList<>();
         List<RawDataGEO> rawList = new ArrayList<>();
-        SampleGEO testSample = new SampleGEO();
+        SampleGEO testSample = new SampleGEO(false);
         RawDataGEO testRaw = new RawDataGEO();
         testRaw.setInstrumentModel("TEST INSTRUMENT MODEL");
         testRaw.setSingleOrPairedEnd("PAIRED END");

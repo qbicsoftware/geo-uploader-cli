@@ -7,13 +7,19 @@ public class SampleGEO {
     private String code;
     private String sampleName, title, sourceName, organism, molecule, description, processedDataFile, rawFile;
     private Map<String, String> characteristics;
+    private Boolean isPaired;
 
-    public SampleGEO() {
+    public SampleGEO(Boolean isPaired) {
 
+        this.isPaired = isPaired;
     }
 
     public String getSampleName() {
         return sampleName;
+    }
+
+    public int getSampleNameLength() {
+        return sampleName.length();
     }
 
     public void setSampleName(String sampleName) {
@@ -125,5 +131,13 @@ public class SampleGEO {
         return line.split("\t");
 
 
+    }
+
+    public Boolean getPaired() {
+        return isPaired;
+    }
+
+    public void setPaired(Boolean paired) {
+        isPaired = paired;
     }
 }
