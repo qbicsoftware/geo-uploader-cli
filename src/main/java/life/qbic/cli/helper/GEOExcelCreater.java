@@ -386,9 +386,9 @@ public class GEOExcelCreater {
         Boolean R1 = false;
         Boolean R2 = false;
         for (int i = 0; i < raws.size(); i++) {
-            if (raws.get(i).getFileName().contains("_R1_"))
+            if (raws.get(i).getFileName().contains("_R1"))
                 R1 = true;
-            if (raws.get(i).getFileName().contains("_R2_"))
+            if (raws.get(i).getFileName().contains("_R2"))
                 R2 = true;
             if (R1 && R2)
 
