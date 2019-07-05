@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.com/qbicsoftware/geo-uploader-cli.svg?branch=development)](https://travis-ci.com/qbicsoftware/geo-uploader-cli)[![Code Coverage]( https://codecov.io/gh/qbicsoftware/geo-uploader-cli/branch/development/graph/badge.svg)](https://codecov.io/gh/qbicsoftware/geo-uploader-cli)
 
-GEO Upload command-line Tool - Command-line utility to upload data to GEO by parsing the information from openBis.
+GEO Upload command-line Tool - Command-line utility to upload sequencing (fastq files) data to GEO by parsing the information from openBis. To be able to use it for microarrays is in progress.
+
 ## Author
 Created by Julian Späth (julian.spaeth@student.uni-tuebingen.de).
 
