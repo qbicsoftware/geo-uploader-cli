@@ -157,6 +157,9 @@ public class GEOOpenBisParser {
     }
 
     public HashMap<String, List> parseSingle() {
+
+        System.out.println("Fetching data");
+
         // Set up fetch options
         SampleFetchOptions fetchOptions = new SampleFetchOptions();
         fetchOptions.withType();
@@ -230,7 +233,7 @@ public class GEOOpenBisParser {
                     rawGeo.setFileName(rawFileName);
 
 
-                    if (rawFileName.contains("dropbox"))
+                    if (rawFileName.contains("dropbox") || rawFileName.contains("_index"))
                         continue;
                     //Create md5 checksum
 
