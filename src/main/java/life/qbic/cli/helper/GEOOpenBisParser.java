@@ -157,6 +157,9 @@ public class GEOOpenBisParser {
     }
 
     public HashMap<String, List> parseSingle() {
+
+        System.out.println("Fetching data");
+
         // Set up fetch options
         SampleFetchOptions fetchOptions = new SampleFetchOptions();
         fetchOptions.withType();

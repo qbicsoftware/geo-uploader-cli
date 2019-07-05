@@ -21,6 +21,7 @@ public class GEOExcelCreater {
     private Boolean pairedEnd;
     private List rawMapList;
     private int numSamples;
+    private int maxRaws;
 
     public GEOExcelCreater(List<SampleGEO> samples, List<RawDataGEO> raws, String outPath,
                            String fileName) throws IOException {
@@ -113,13 +114,14 @@ public class GEOExcelCreater {
                 charLabels = MessageFormat.format("characteristics: {0}\t{1}", key, charLabels);
             }
         String header;
-        if (!pairedEnd) {
+
             header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
-                    + "molecule\tdescription\tprocessed data file\traw file";
-        } else {
-            header = "Sample name\ttitle\tsource name\torganism\t" + charLabels
-                    + "molecule\tdescription\tprocessed data file\traw file\traw file";
+                    + "molecule\tdescription\tprocessed data file";
+        //check the maximum amount of raw files per sample and add enough raw file columns accordingly
+        for (int i = 0; i < maxRaws; i++) {
+            header += "\traw file";
         }
+
 
         String[] headerArray = header.split("\t");
         ArrayUtils.reverse(headerArray);
@@ -143,9 +145,25 @@ public class GEOExcelCreater {
 
         int numCharacteristicsMax = 0;
         List<Integer> characteristicsNumList = new ArrayList<>();
+        String oldName = "";
+        String sampName = "  ";
 
 
         for (SampleGEO sample : samples) {
+            sampName = sample.getSampleName();
+
+            if (!oldName.equals(sampName)) {
+                sampleIdentList = new ArrayList<>();
+                sampleIdentMap.put(sampName, sampleIdentList);
+            }
+
+
+            if (sample.getRawFile().contains(getIdentFromRawName(sample.getRawFile())) &&
+                    !sampleIdentList.contains(sample.getRawFile())
+            ) {
+                sampleIdentList.add(sample.getRawFile());
+            }
+
 
             if (sample.getCharacteristics() != null)
                 characteristicsNumList.add(sample.getCharacteristics().size());
@@ -162,24 +180,17 @@ public class GEOExcelCreater {
 
             }
 
-            if (!sampleIdentMap.containsKey(sample.getRawFile())) {
-                sampleIdentList.add(sample.getRawFile());
-                if (sample.getPaired()) {
-                    if (sampleIdentList.size() == 2) {
-                        sampleIdentMap.put(sample.getSampleName(), new ArrayList<>(sampleIdentList));
-                        sampleIdentList.clear();
-                    }
-                } else {
-                    if (sampleIdentList.size() == 1) {
-                        sampleIdentMap.put(sample.getSampleName(), new ArrayList<>(sampleIdentList));
-                        sampleIdentList.clear();
-                    }
 
-                }
-
+            if (sample.getRawFile().contains(getIdentFromRawName(sample.getRawFile()))) {
 
             }
+
+
+            oldName = sampName;
         }
+
+
+
 
         List<SampleGEO> sampleList = new ArrayList(sampleMap.values());
 
@@ -228,16 +239,17 @@ public class GEOExcelCreater {
                     sheet.getRow(i + 20).createCell(j);
                     sheet.getRow(i + 20).getCell(j).setCellValue(sampleMap.get(sampleList.get(i).getSampleName()).getSampleRow()[j]);
                     if (j == lastColIndexSum - 1) {
-                        sheet.getRow(i + 20).createCell(j);
-                        sheet.getRow(i + 20).getCell(j).setCellValue(sampleIdentMap.get(sampleList.get(i).getSampleName()).get(0));
-                        if (sampleList.get(i).getPaired()) {
-                            sheet.getRow(i + 20).createCell(j + 1);
-                            sheet.getRow(i + 20).getCell(j + 1).setCellValue(sampleIdentMap.get(sampleList.get(i).getSampleName()).get(1));
+                        //write all raw files of sample row to sample columns
+                        for (int k = 0; k < sampleIdentMap.get(sampleList.get(i).getSampleName()).size(); k++) {
+
+                            sheet.getRow(i + 20).createCell(j + k);
+                            sheet.getRow(i + 20).getCell(j + k).setCellValue(sampleIdentMap.get(sampleList.get(i).getSampleName()).get(k));
+                        }
                         }
 
 
                     }
-                }
+
             } catch (ArrayIndexOutOfBoundsException e) {
 
             }
@@ -261,7 +273,7 @@ public class GEOExcelCreater {
         identList.clear();
         identList.addAll(set);
 
-        sheet.shiftRows(60, sheet.getLastRowNum(), rawMap.size() - 2);
+        sheet.shiftRows(60, sheet.getLastRowNum(), rawMap.size());
         numSamples = rawMap.size();
         int j = 0;
         for (int i = 0; i < numSamples; i++) {
@@ -340,12 +352,15 @@ public class GEOExcelCreater {
         identListWithoutDuplicates.addAll(setItems2);
 
         int numRaws = 0;
-
+        int sampleRawsNum = 0;
+        List<Integer> maxRawList = new ArrayList<>();
         for (int i = 0; i < rawNameMap.size(); i++) {
-            numRaws += rawNameMap.get(identListWithoutDuplicates.get(i)).size();
+            sampleRawsNum = rawNameMap.get(identListWithoutDuplicates.get(i)).size();
+            numRaws += sampleRawsNum;
+            maxRawList.add(sampleRawsNum);
 
         }
-
+        maxRaws = Collections.max(maxRawList);
 
         sheet.shiftRows(53, sheet.getLastRowNum(), numRaws + 2);
         addRawFilesRowsSinglePaired(sheet, raw);
@@ -381,9 +396,9 @@ public class GEOExcelCreater {
         Boolean R1 = false;
         Boolean R2 = false;
         for (int i = 0; i < raws.size(); i++) {
-            if (raws.get(i).getFileName().contains("_R1_"))
+            if (raws.get(i).getFileName().contains("_R1"))
                 R1 = true;
-            if (raws.get(i).getFileName().contains("_R2_"))
+            if (raws.get(i).getFileName().contains("_R2"))
                 R2 = true;
             if (R1 && R2)
 
@@ -448,26 +463,16 @@ public class GEOExcelCreater {
         String[] idents;
         String ident = "";
         try {
-            idents = rawName.split("_");
-            if (idents.length > 3)
-                ident = idents[0] + "_" + idents[1] + "_" + idents[2] + "_" + idents[3];
-            else if (idents.length < 3) {
-                if (ident.length() == 2) {
 
                     idents = rawName.split("_");
                     ident = idents[0];
 
-                }
 
-            }
         } catch (
+
                 ArrayIndexOutOfBoundsException e) {
-            try {
-                idents = rawName.split("_");
-                ident = idents[0];
-            } catch (ArrayIndexOutOfBoundsException f) {
-                e.printStackTrace();
-            }
+            System.out.println("WARNING: Exception caught check output manually!");
+            e.printStackTrace();
         }
         return ident;
     }
