@@ -52,26 +52,21 @@ public class GEOExcelCreater {
         pairedEnd = checkSingleOrPaired(raws);
 
         XSSFSheet sheet = wb.getSheetAt(0);
-        if (pairedEnd) {
-            System.out.println("Writing " + numSamples + " Samples to Excel File ...");
-
-        } else {
 
 
-            System.out.println("Writing " + numSamples + " Samples to Excel File ...");
-        }
+
         //add paired end information and raw information for paired end experiments
         //method returns true if project contains paired ened data
         if (pairedEnd) {
             try {
-                if (pairedEnd)
+
                     System.out.println("Found paired end data");
                 addPairedEndFilesRow(sheet, raws);
                 addRawFilesRows(sheet, raws);
 
 
             } catch (ArrayIndexOutOfBoundsException e) {
-                System.out.println("No samples found. Please check your input and try again.");
+                System.out.println("WARNING: Caught an exception. Please check raw and paired end rows manually!");
             }
         } else {
             // if the project is not paired end then only add the raw file infos
@@ -80,15 +75,16 @@ public class GEOExcelCreater {
         try {
             adaptSampleHeader(sheet, samples);
         } catch (IndexOutOfBoundsException e) {
-            System.out.println("No samples found. Please check your input and try again.");
+            System.out.println("WARNING: Please check sample header column manually!");
 
         }
+        System.out.println("Writing Samples to Excel File ...");
 
 
         try {
             addSampleRows(sheet, samples);
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("No samples found. Please check your input and try again.");
+            System.out.println("WARNING! Exception caught. Please check sample rows manually..");
             e.printStackTrace();
         }
 
@@ -103,7 +99,6 @@ public class GEOExcelCreater {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private void adaptSampleHeader(Sheet sheet, List<SampleGEO> samples)
@@ -416,16 +411,17 @@ public class GEOExcelCreater {
         for (int i = 0; i < raw.size(); i++) {
             String name = raw.get(i).getFileName();
             String ident = getIdentFromRawName(name);
+            ArrayList<Object> rawList = new ArrayList<>();
             try {
                 identList.add(ident);
                 identRawMap.put(ident, raw.get(i));
-                ArrayList<Object> rawList = new ArrayList<>();
+
 
 
                 for (int j = 0; j < raw.size(); j++) {
                     String name2 = raw.get(j).getFileName();
 
-                    if (name2.contains(ident) && !rawList.contains(name2) && !rawList.contains(name)) {
+                    if (name2.contains(ident) && !rawList.contains(name2)) {
                         rawList.add(name2);
                         identRawNameMap.put(ident, rawList);
                     }
@@ -433,6 +429,7 @@ public class GEOExcelCreater {
 
 
             } catch (ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
                 continue;
             }
 
@@ -449,14 +446,28 @@ public class GEOExcelCreater {
 
     public String getIdentFromRawName(String rawName) {
         String[] idents;
-        String ident;
+        String ident = "";
         try {
             idents = rawName.split("_");
-            ident = idents[0] + "_" + idents[1] + "_" + idents[2] + "_" + idents[3];
+            if (idents.length > 3)
+                ident = idents[0] + "_" + idents[1] + "_" + idents[2] + "_" + idents[3];
+            else if (idents.length < 3) {
+                if (ident.length() == 2) {
+
+                    idents = rawName.split("_");
+                    ident = idents[0];
+
+                }
+
+            }
         } catch (
                 ArrayIndexOutOfBoundsException e) {
-            ident = "";
-            e.printStackTrace();
+            try {
+                idents = rawName.split("_");
+                ident = idents[0];
+            } catch (ArrayIndexOutOfBoundsException f) {
+                e.printStackTrace();
+            }
         }
         return ident;
     }

@@ -230,7 +230,7 @@ public class GEOOpenBisParser {
                     rawGeo.setFileName(rawFileName);
 
 
-                    if (rawFileName.contains("dropbox"))
+                    if (rawFileName.contains("dropbox") || rawFileName.contains("_index"))
                         continue;
                     //Create md5 checksum
 
