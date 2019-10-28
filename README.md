@@ -7,7 +7,7 @@ GEO Upload command-line Tool - Command-line utility to upload sequencing (fastq 
 ## Author
 Created by Julian Späth (julian.spaeth@student.uni-tuebingen.de).
 
-Further development by Timo Lucas (https://github.com/lucass122) (timo-niklas.lucas@student.uni-tuebingen.de)
+Further development by Timo Lucas (https://github.com/lucass122) (timo-niklas.lucas@student.uni-tuebingen.de) and Stefan Czemmel (https://github.com/qbicStefanC) (https://github.com/lucass122) (stefan.czemmel@qbic.uni-tuebingen). 
 
 ## Description
 
